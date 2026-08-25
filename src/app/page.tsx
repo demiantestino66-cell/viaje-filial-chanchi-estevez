@@ -24,6 +24,7 @@ const FECHA_PARTIDO = new Date('2026-10-18T17:30:00');
 export default function ViajeFilialPage() {
   const [currentImg, setCurrentImg] = useState(0);
   const [currentAudioIndex, setCurrentAudioIndex] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const [timeLeftSalida, setTimeLeftSalida] = useState({ d: 0, h: 0, m: 0, s: 0 });
@@ -57,7 +58,6 @@ export default function ViajeFilialPage() {
     return () => clearInterval(timer);
   }, []);
 
-  // Rotación rápida y fluida de imágenes de fondo (cada 4.5 segundos)
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentImg((prev) => (prev + 1) % IMAGENES.length);
@@ -65,38 +65,26 @@ export default function ViajeFilialPage() {
     return () => clearInterval(interval);
   }, []);
 
-  // Activación de audio táctil optimizada para celulares
-  useEffect(() => {
-    const initAudio = () => {
-      if (audioRef.current && audioRef.current.paused) {
-        audioRef.current.volume = 0.4; // Subimos al 40% para que se escuche claro en el celu
-        audioRef.current.play().catch(() => {});
-      }
-      window.removeEventListener('click', initAudio);
-      window.removeEventListener('scroll', initAudio);
-      window.removeEventListener('touchstart', initAudio);
-    };
-
-    window.addEventListener('click', initAudio);
-    window.addEventListener('scroll', initAudio);
-    window.addEventListener('touchstart', initAudio);
-
-    return () => {
-      window.removeEventListener('click', initAudio);
-      window.removeEventListener('scroll', initAudio);
-      window.removeEventListener('touchstart', initAudio);
-    };
-  }, []);
-
-  useEffect(() => {
+  // Control manual y seguro del reproductor para celulares
+  const togglePlayAudio = () => {
     if (audioRef.current) {
-      audioRef.current.volume = 0.4;
-      audioRef.current.play().catch(() => {});
+      if (isPlaying) {
+        audioRef.current.pause();
+        setIsPlaying(false);
+      } else {
+        audioRef.current.volume = 0.5;
+        audioRef.current.play().then(() => {
+          setIsPlaying(true);
+        }).catch(() => {});
+      }
     }
-  }, [currentAudioIndex]);
+  };
 
   const handleAudioEnded = () => {
     setCurrentAudioIndex((prev) => (prev + 1) % AUDIOS.length);
+    if (audioRef.current) {
+      audioRef.current.play().catch(() => {});
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -121,7 +109,15 @@ export default function ViajeFilialPage() {
         onEnded={handleAudioEnded} 
       />
 
-      {/* FONDO: Visible al 80% con gradiente muy ligero para que las fotos respiren */}
+      {/* BOTÓN FLOTANTE DE MÚSICA (Esquina superior izquierda) para asegurar el control en celulares */}
+      <button 
+        onClick={togglePlayAudio}
+        className="fixed top-6 left-6 z-50 bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold px-4 py-2 rounded-full shadow-[0_0_20px_rgba(56,189,248,0.6)] flex items-center gap-2 border-2 border-white transition-all duration-300 animate-pulse text-xs uppercase tracking-wider cursor-pointer"
+      >
+        <span>{isPlaying ? '🔊 Música ON' : '🔇 Reproducir Música'}</span>
+      </button>
+
+      {/* FONDO */}
       <div className="fixed inset-0 z-0 pointer-events-none bg-slate-950">
         {IMAGENES.map((img, index) => (
           <div
@@ -151,7 +147,6 @@ export default function ViajeFilialPage() {
             </h2>
           </div>
 
-          {/* Tarjeta más transparente (bg-slate-900/40) para ver el fondo */}
           <div className="bg-slate-900/40 backdrop-blur-md border border-sky-500/30 p-6 rounded-2xl w-full max-w-2xl shadow-2xl">
             <h3 className="text-2xl text-sky-300 font-bold uppercase mb-6 animate-pulse">¡Ya falta menos!</h3>
             
@@ -259,7 +254,7 @@ export default function ViajeFilialPage() {
             <div className="flex gap-5 items-start bg-slate-900/50 backdrop-blur-md p-5 rounded-xl border-l-4 border-sky-500 shadow-xl">
               <div className="bg-sky-500/20 p-3 rounded-full border border-sky-500/40 text-sky-400 drop-shadow-md">
                 <svg className="w-10 h-10" viewBox="0 0 24 24" fill="currentColor">
-                   <path d="M12 2C6.5 2 2 4.5 2 7v10c0 2.5 4.5 5 10 5s10-2.5 10-5V7c0-2.5-4.5-5-10-5zm0 18c-4.4 0-8-2.2-8-4V9.6c2.1 1.5 5 2.4 8 2.4s5.9-.9 8-2.4V16c0 1.8-3.6 4-8 4zm0-9c-4.4 0-8-1.8-8-4s3.6-4 8-4 8 1.8 8 4-3.6 4-8 4 z"/>
+                   <path d="M12 2C6.5 2 2 4.5 2 7v10c0 2.5 4.5 5 10 5s10-2.5 10-5V7c0-2.5-4.5-5-10-5zm0 18c-4.4 0-8-2.2-8-4V9.6c2.1 1.5 5 2.4 8 2.4s5.9-.9 8-2.4V16c0 1.8-3.6 4-8 4zm0-9c-4.4 0-8-1.8-8-4s3.6-4 8-4 8 1.8 8 4-3.6 4-8 4z"/>
                 </svg>
               </div>
               <div>
