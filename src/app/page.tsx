@@ -38,6 +38,7 @@ export default function ViajeFilialPage() {
     aclaraciones: '',
   });
 
+  // Cuenta regresiva
   useEffect(() => {
     const calculateTime = (targetDate: Date) => {
       const diff = targetDate.getTime() - new Date().getTime();
@@ -58,6 +59,7 @@ export default function ViajeFilialPage() {
     return () => clearInterval(timer);
   }, []);
 
+  // Rotación de imágenes
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentImg((prev) => (prev + 1) % IMAGENES.length);
@@ -65,7 +67,38 @@ export default function ViajeFilialPage() {
     return () => clearInterval(interval);
   }, []);
 
-  // Control manual y seguro del reproductor para celulares
+  // Control estricto del reproductor cíclico de audio
+  useEffect(() => {
+    const audioEl = audioRef.current;
+    if (!audioEl) return;
+
+    const handleEnded = () => {
+      // Pasa al siguiente audio en bucle infinito (0 -> 1 -> 0 -> 1...)
+      setCurrentAudioIndex((prevIndex) => {
+        const nextIndex = (prevIndex + 1) % AUDIOS.length;
+        return nextIndex;
+      });
+    };
+
+    audioEl.addEventListener('ended', handleEnded);
+    return () => {
+      audioEl.removeEventListener('ended', handleEnded);
+    };
+  }, []);
+
+  // Cada vez que cambia el índice de audio, cargamos la pista y damos play si estaba activo
+  useEffect(() => {
+    const audioEl = audioRef.current;
+    if (!audioEl) return;
+
+    audioEl.src = AUDIOS[currentAudioIndex];
+    audioEl.load();
+    if (isPlaying) {
+      audioEl.volume = 0.5;
+      audioEl.play().catch(() => {});
+    }
+  }, [currentAudioIndex, isPlaying]);
+
   const togglePlayAudio = () => {
     if (audioRef.current) {
       if (isPlaying) {
@@ -77,13 +110,6 @@ export default function ViajeFilialPage() {
           setIsPlaying(true);
         }).catch(() => {});
       }
-    }
-  };
-
-  const handleAudioEnded = () => {
-    setCurrentAudioIndex((prev) => (prev + 1) % AUDIOS.length);
-    if (audioRef.current) {
-      audioRef.current.play().catch(() => {});
     }
   };
 
@@ -103,13 +129,10 @@ export default function ViajeFilialPage() {
   return (
     <main className={`relative w-full bg-slate-950 text-white overflow-x-hidden ${oswald.className} scroll-smooth`}>
       
-      <audio 
-        ref={audioRef} 
-        src={AUDIOS[currentAudioIndex]} 
-        onEnded={handleAudioEnded} 
-      />
+      {/* Elemento de audio nativo controlado por estado */}
+      <audio ref={audioRef} src={AUDIOS[currentAudioIndex]} preload="auto" />
 
-      {/* BOTÓN FLOTANTE DE MÚSICA (Esquina superior izquierda) para asegurar el control en celulares */}
+      {/* Botón flotante de control de música */}
       <button 
         onClick={togglePlayAudio}
         className="fixed top-6 left-6 z-50 bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold px-4 py-2 rounded-full shadow-[0_0_20px_rgba(56,189,248,0.6)] flex items-center gap-2 border-2 border-white transition-all duration-300 animate-pulse text-xs uppercase tracking-wider cursor-pointer"
@@ -117,7 +140,7 @@ export default function ViajeFilialPage() {
         <span>{isPlaying ? '🔊 Música ON' : '🔇 Reproducir Música'}</span>
       </button>
 
-      {/* FONDO */}
+      {/* Fondos */}
       <div className="fixed inset-0 z-0 pointer-events-none bg-slate-950">
         {IMAGENES.map((img, index) => (
           <div
@@ -136,7 +159,7 @@ export default function ViajeFilialPage() {
       </div>
 
       <div className="relative z-10">
-        {/* PANTALLA 1 */}
+        {/* PANTALLA 1: HERO & CONTADORES */}
         <section className="min-h-[100svh] flex flex-col items-center justify-center p-6 text-center space-y-8">
           <div className="bg-slate-950/30 p-4 rounded-2xl backdrop-blur-[2px] border border-white/10">
             <h1 className="text-4xl md:text-6xl font-bold text-sky-400 uppercase drop-shadow-[0_4px_10px_rgba(0,0,0,0.9)] mb-2">
@@ -181,7 +204,7 @@ export default function ViajeFilialPage() {
           </div>
         </section>
 
-        {/* PANTALLA 2 */}
+        {/* PANTALLA 2: BENEFICIOS Y PRECIOS */}
         <section className="min-h-[100svh] flex flex-col items-center justify-center p-6 text-center space-y-8">
           <div className="max-w-3xl w-full bg-slate-900/45 backdrop-blur-md rounded-3xl p-8 md:p-12 shadow-2xl border border-sky-500/35">
             <h2 className="text-3xl md:text-5xl font-bold text-white uppercase mb-4 leading-tight drop-shadow-md">
@@ -208,7 +231,7 @@ export default function ViajeFilialPage() {
           </div>
         </section>
 
-        {/* PANTALLA 3 */}
+        {/* PANTALLA 3: ITINERARIO */}
         <section className="min-h-[100svh] flex flex-col items-center justify-center p-6 w-full">
           <h2 className="text-4xl md:text-5xl font-bold text-sky-400 uppercase mb-10 text-center drop-shadow-[0_4px_10px_rgba(0,0,0,0.9)] bg-slate-950/40 backdrop-blur-sm p-3 rounded-xl border border-white/10">
             Itinerario del Viaje
@@ -269,7 +292,7 @@ export default function ViajeFilialPage() {
           </div>
         </section>
 
-        {/* PANTALLA 4 */}
+        {/* PANTALLA 4: MÉTODOS DE PAGO */}
         <section className="min-h-[70svh] flex flex-col items-center justify-center p-6 text-center">
           <div className="bg-slate-900/50 backdrop-blur-md p-10 rounded-3xl border-2 border-sky-500/30 w-full max-w-3xl shadow-2xl">
             <h2 className="text-3xl font-bold text-white uppercase mb-10">Métodos de Pago</h2>
@@ -308,7 +331,7 @@ export default function ViajeFilialPage() {
           </div>
         </section>
 
-        {/* PANTALLA 5 */}
+        {/* PANTALLA 5: FORMULARIO */}
         <section className="min-h-[100svh] flex flex-col items-center justify-center p-4 pb-20">
           <div className="max-w-md w-full bg-slate-900/55 backdrop-blur-xl rounded-2xl p-6 md:p-8 shadow-[0_0_30px_rgba(0,0,0,0.8)] border border-sky-500/40">
             
@@ -384,7 +407,7 @@ export default function ViajeFilialPage() {
                 type="submit"
                 className="w-full bg-sky-500 hover:bg-sky-400 text-slate-950 font-black py-4 rounded-lg shadow-[0_0_20px_rgba(56,189,248,0.4)] hover:shadow-[0_0_30px_rgba(56,189,248,0.6)] transition duration-300 mt-4 uppercase tracking-widest text-lg cursor-pointer"
               >
-                Enviar a WhatsApp
+                Enviar Reserva a Jony
               </button>
             </form>
           </div>
