@@ -57,17 +57,19 @@ export default function ViajeFilialPage() {
     return () => clearInterval(timer);
   }, []);
 
+  // Rotación rápida y fluida de imágenes de fondo (cada 4.5 segundos)
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentImg((prev) => (prev + 1) % IMAGENES.length);
-    }, 6000);
+    }, 4500);
     return () => clearInterval(interval);
   }, []);
 
+  // Activación de audio táctil optimizada para celulares
   useEffect(() => {
     const initAudio = () => {
       if (audioRef.current && audioRef.current.paused) {
-        audioRef.current.volume = 0.15;
+        audioRef.current.volume = 0.4; // Subimos al 40% para que se escuche claro en el celu
         audioRef.current.play().catch(() => {});
       }
       window.removeEventListener('click', initAudio);
@@ -88,7 +90,7 @@ export default function ViajeFilialPage() {
 
   useEffect(() => {
     if (audioRef.current) {
-      audioRef.current.volume = 0.15;
+      audioRef.current.volume = 0.4;
       audioRef.current.play().catch(() => {});
     }
   }, [currentAudioIndex]);
@@ -119,17 +121,18 @@ export default function ViajeFilialPage() {
         onEnded={handleAudioEnded} 
       />
 
+      {/* FONDO: Visible al 80% con gradiente muy ligero para que las fotos respiren */}
       <div className="fixed inset-0 z-0 pointer-events-none bg-slate-950">
         {IMAGENES.map((img, index) => (
           <div
             key={img}
             className={`absolute inset-0 bg-cover bg-center transition-opacity duration-1000 ease-in-out ${
-              index === currentImg ? 'opacity-[0.65] scale-105' : 'opacity-0 scale-100'
-            } transition-transform duration-[8000ms]`}
+              index === currentImg ? 'opacity-[0.80] scale-105' : 'opacity-0 scale-100'
+            } transition-transform duration-[6000ms]`}
             style={{ backgroundImage: `url(${img})` }}
           />
         ))}
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/70 via-slate-900/40 to-slate-950/80" />
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/40 via-slate-950/30 to-slate-950/50" />
       </div>
 
       <div className="fixed top-6 right-6 z-50 pointer-events-none animate-bounce duration-1000">
@@ -137,22 +140,24 @@ export default function ViajeFilialPage() {
       </div>
 
       <div className="relative z-10">
+        {/* PANTALLA 1 */}
         <section className="min-h-[100svh] flex flex-col items-center justify-center p-6 text-center space-y-8">
-          <div className="bg-slate-950/40 p-4 rounded-2xl backdrop-blur-sm border border-slate-700/50">
-            <h1 className="text-4xl md:text-6xl font-bold text-sky-400 uppercase drop-shadow-[0_4px_10px_rgba(0,0,0,0.8)] mb-2">
+          <div className="bg-slate-950/30 p-4 rounded-2xl backdrop-blur-[2px] border border-white/10">
+            <h1 className="text-4xl md:text-6xl font-bold text-sky-400 uppercase drop-shadow-[0_4px_10px_rgba(0,0,0,0.9)] mb-2">
               Nos vamos al Cilindro
             </h1>
-            <h2 className="text-xl md:text-3xl text-white uppercase tracking-widest font-light drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+            <h2 className="text-xl md:text-3xl text-white uppercase tracking-widest font-light drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
               Y en esta página podés reservar tu lugar
             </h2>
           </div>
 
-          <div className="bg-slate-900/70 backdrop-blur-md border border-sky-500/50 p-6 rounded-2xl w-full max-w-2xl shadow-2xl">
+          {/* Tarjeta más transparente (bg-slate-900/40) para ver el fondo */}
+          <div className="bg-slate-900/40 backdrop-blur-md border border-sky-500/30 p-6 rounded-2xl w-full max-w-2xl shadow-2xl">
             <h3 className="text-2xl text-sky-300 font-bold uppercase mb-6 animate-pulse">¡Ya falta menos!</h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="flex flex-col items-center">
-                <p className="text-sm text-slate-300 uppercase mb-2 font-bold tracking-wider">Salida del Bondi</p>
+                <p className="text-sm text-slate-200 uppercase mb-2 font-bold tracking-wider">Salida del Bondi</p>
                 <div className="flex gap-3 text-2xl font-bold text-white drop-shadow-md">
                   <div className="flex flex-col items-center"><span className="text-4xl text-sky-400">{timeLeftSalida.d}</span><span className="text-xs font-normal">Días</span></div>
                   <span>:</span>
@@ -160,11 +165,11 @@ export default function ViajeFilialPage() {
                   <span>:</span>
                   <div className="flex flex-col items-center"><span className="text-4xl text-sky-400">{timeLeftSalida.m}</span><span className="text-xs font-normal">Min</span></div>
                 </div>
-                <p className="text-xs text-slate-300 mt-2 max-w-[200px] font-sans">17 de Octubre, 12:00 PM<br/>La Anónima (Colombia y Av. Trabajadores)</p>
+                <p className="text-xs text-slate-100 mt-2 max-w-[200px] font-sans font-medium drop-shadow">17 de Octubre, 12:00 PM<br/>La Anónima (Colombia y Av. Trabajadores)</p>
               </div>
 
               <div className="flex flex-col items-center">
-                <p className="text-sm text-slate-300 uppercase mb-2 font-bold tracking-wider">Inicio del Partido</p>
+                <p className="text-sm text-slate-200 uppercase mb-2 font-bold tracking-wider">Inicio del Partido</p>
                 <div className="flex gap-3 text-2xl font-bold text-white drop-shadow-md">
                   <div className="flex flex-col items-center"><span className="text-4xl text-white">{timeLeftPartido.d}</span><span className="text-xs font-normal">Días</span></div>
                   <span>:</span>
@@ -172,103 +177,106 @@ export default function ViajeFilialPage() {
                   <span>:</span>
                   <div className="flex flex-col items-center"><span className="text-4xl text-white">{timeLeftPartido.m}</span><span className="text-xs font-normal">Min</span></div>
                 </div>
-                <p className="text-xs text-slate-300 mt-2 font-sans">18 de Octubre, 17:30 HS (A confirmar)</p>
+                <p className="text-xs text-slate-100 mt-2 font-sans font-medium drop-shadow">18 de Octubre, 17:30 HS (A confirmar)</p>
               </div>
             </div>
           </div>
-          <div className="absolute bottom-8 animate-bounce text-sky-400 opacity-90 bg-slate-900/50 rounded-full p-2 backdrop-blur-md">
+          <div className="absolute bottom-8 animate-bounce text-sky-400 opacity-90 bg-slate-900/40 rounded-full p-2 backdrop-blur-sm">
             <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
           </div>
         </section>
 
+        {/* PANTALLA 2 */}
         <section className="min-h-[100svh] flex flex-col items-center justify-center p-6 text-center space-y-8">
-          <div className="max-w-3xl w-full bg-slate-900/85 backdrop-blur-xl rounded-3xl p-8 md:p-12 shadow-2xl border-t border-sky-500/60">
+          <div className="max-w-3xl w-full bg-slate-900/45 backdrop-blur-md rounded-3xl p-8 md:p-12 shadow-2xl border border-sky-500/35">
             <h2 className="text-3xl md:text-5xl font-bold text-white uppercase mb-4 leading-tight drop-shadow-md">
               Si sos socio de la Filial Chanchi Estévez de Trelew <span className="text-sky-400">tenés beneficios siempre</span>
             </h2>
-            <p className="text-lg md:text-xl text-slate-200 mb-10 font-sans">
+            <p className="text-lg md:text-xl text-slate-200 mb-10 font-sans font-medium drop-shadow">
               Completá el formulario abajo del todo y reservá tu lugar.
             </p>
 
             <div className="flex flex-col md:flex-row justify-center gap-6 mb-8 font-sans">
-              <div className="bg-gradient-to-b from-sky-600/30 to-sky-900/30 border-2 border-sky-500/50 rounded-2xl p-6 flex-1 shadow-[0_0_15px_rgba(56,189,248,0.2)]">
+              <div className="bg-sky-950/60 border-2 border-sky-500/50 rounded-2xl p-6 flex-1 shadow-lg backdrop-blur-sm">
                 <p className="text-sm uppercase text-sky-200 font-black mb-2 tracking-widest">Socios de la Filial</p>
                 <p className="text-4xl md:text-5xl font-black text-white">$240.000</p>
               </div>
-              <div className="bg-slate-800/80 border-2 border-slate-600/50 rounded-2xl p-6 flex-1 shadow-lg">
-                <p className="text-sm uppercase text-slate-400 font-bold mb-2 tracking-widest">No Socios</p>
+              <div className="bg-slate-900/60 border-2 border-slate-600/50 rounded-2xl p-6 flex-1 shadow-lg backdrop-blur-sm">
+                <p className="text-sm uppercase text-slate-300 font-bold mb-2 tracking-widest">No Socios</p>
                 <p className="text-4xl md:text-5xl font-black text-slate-300">$270.000</p>
               </div>
             </div>
 
-            <p className="text-xs md:text-sm text-sky-200 uppercase tracking-widest font-sans font-semibold">
+            <p className="text-xs md:text-sm text-sky-200 uppercase tracking-widest font-sans font-bold drop-shadow">
               (Precios para Socios Avellaneda. ¿No sos socio? Comunicate vía formulario)
             </p>
           </div>
         </section>
 
+        {/* PANTALLA 3 */}
         <section className="min-h-[100svh] flex flex-col items-center justify-center p-6 w-full">
-          <h2 className="text-4xl md:text-5xl font-bold text-sky-400 uppercase mb-10 text-center drop-shadow-[0_4px_10px_rgba(0,0,0,0.8)] bg-slate-950/50 backdrop-blur-sm p-3 rounded-xl border border-slate-700/50">
+          <h2 className="text-4xl md:text-5xl font-bold text-sky-400 uppercase mb-10 text-center drop-shadow-[0_4px_10px_rgba(0,0,0,0.9)] bg-slate-950/40 backdrop-blur-sm p-3 rounded-xl border border-white/10">
             Itinerario del Viaje
           </h2>
           
-          <div className="max-w-2xl w-full space-y-6 font-sans">
-            <div className="flex gap-5 items-start bg-slate-900/85 backdrop-blur-md p-5 rounded-xl border-l-4 border-sky-500 shadow-xl">
-              <div className="bg-sky-500/10 p-3 rounded-full border border-sky-500/30 text-sky-400 drop-shadow-md">
+          <div className="max-w-2xl w-full space-y-5 font-sans">
+            <div className="flex gap-5 items-start bg-slate-900/50 backdrop-blur-md p-5 rounded-xl border-l-4 border-sky-500 shadow-xl">
+              <div className="bg-sky-500/20 p-3 rounded-full border border-sky-500/40 text-sky-400 drop-shadow-md">
                 <svg className="w-10 h-10" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M4 16c0 .88.39 1.67 1 2.22v1.28c0 .83.67 1.5 1.5 1.5S8 20.33 8 19.5V19h8v.5c0 .82.67 1.5 1.5 1.5.82 0 1.5-.68 1.5-1.5v-1.28c.61-.55 1-1.34 1-2.22V6c0-3.5-3.58-4-8-4s-8 .5-8 4v10zm3.5 1c-.83 0-1.5-.67-1.5-1.5S6.67 14 7.5 14s1.5.67 1.5 1.5S8.33 17 7.5 17zm9 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-6H6V7h12v4z"/>
                 </svg>
               </div>
               <div>
                 <h4 className="font-bold text-white text-lg uppercase">Salida desde Trelew</h4>
-                <p className="text-slate-300 text-sm mt-1">Día 17 a las 12:00 PM. Bombos, canciones y mucho más para compartir una experiencia única.</p>
+                <p className="text-slate-200 text-sm mt-1 font-medium drop-shadow-sm">Día 17 a las 12:00 PM. Bombos, canciones y mucho más para compartir una experiencia única.</p>
               </div>
             </div>
             
-            <div className="flex gap-5 items-start bg-slate-900/85 backdrop-blur-md p-5 rounded-xl border-l-4 border-sky-500 shadow-xl">
-              <div className="bg-sky-500/10 p-3 rounded-full border border-sky-500/30 text-sky-400 drop-shadow-md">
+            <div className="flex gap-5 items-start bg-slate-900/50 backdrop-blur-md p-5 rounded-xl border-l-4 border-sky-500 shadow-xl">
+              <div className="bg-sky-500/20 p-3 rounded-full border border-sky-500/40 text-sky-400 drop-shadow-md">
                 <svg className="w-10 h-10" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M22,18H2V20H22V18M13.84,13C12.8,11.23 12,8.85 12,6C12,8.85 11.2,11.23 10.16,13C8.61,15.65 6,15.93 6,15.93H18C18,15.93 15.39,15.65 13.84,13M21,11V13H19C19,10.61 17.57,8.5 15.42,7.56C17.06,7.18 18.25,5.63 18.25,3.75V3H19.75V3.75C19.75,4.72 20.53,5.5 21.5,5.5V7C20.08,7 18.84,7.84 18.37,9.08C19.92,9.35 21,10.05 21,11M5.75,3H4.25V3.75C4.25,5.63 5.44,7.18 7.08,7.56C4.93,8.5 3.5,10.61 3.5,13V11C3.5,10.05 4.58,9.35 6.13,9.08C5.66,7.84 4.42,7 3,7V5.5C3.97,5.5 4.75,4.72 4.75,3.75V3H5.75Z" />
                 </svg>
               </div>
               <div>
                 <h4 className="font-bold text-white text-lg uppercase">Predio Tita (A confirmar)</h4>
-                <p className="text-slate-300 text-sm mt-1">Llegamos, comemos y compartimos en los fogones en la previa del partido.</p>
+                <p className="text-slate-200 text-sm mt-1 font-medium drop-shadow-sm">Llegamos, comemos y compartimos en los fogones en la previa del partido.</p>
               </div>
             </div>
 
-            <div className="flex gap-5 items-start bg-slate-900/85 backdrop-blur-md p-5 rounded-xl border-l-4 border-sky-500 shadow-xl">
-              <div className="bg-sky-500/10 p-3 rounded-full border border-sky-500/30 text-sky-400 drop-shadow-md">
+            <div className="flex gap-5 items-start bg-slate-900/50 backdrop-blur-md p-5 rounded-xl border-l-4 border-sky-500 shadow-xl">
+              <div className="bg-sky-500/20 p-3 rounded-full border border-sky-500/40 text-sky-400 drop-shadow-md">
                 <svg className="w-10 h-10" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M22,10V6A2,2 0 0,0 20,4H4A2,2 0 0,0 2,6V10C3.11,10 4,10.9 4,12C4,13.11 3.11,14 2,14V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V14C20.89,14 20,13.11 20,12C20,10.9 20.89,10 22,10M11,15H9V13H11V15M11,11H9V9H11V11M15,15H13V13H15V15M15,11H13V9H15V11Z" />
                 </svg>
               </div>
               <div>
                 <h4 className="font-bold text-white text-lg uppercase">Entradas y Credenciales</h4>
-                <p className="text-slate-300 text-sm mt-1">Entrega de entradas y organización. Caminata hasta el Cilindro en grupos consolidados.</p>
+                <p className="text-slate-200 text-sm mt-1 font-medium drop-shadow-sm">Entrega de entradas y organización. Caminata hasta el Cilindro en grupos consolidados.</p>
               </div>
             </div>
 
-            <div className="flex gap-5 items-start bg-slate-900/85 backdrop-blur-md p-5 rounded-xl border-l-4 border-sky-500 shadow-xl">
-              <div className="bg-sky-500/10 p-3 rounded-full border border-sky-500/30 text-sky-400 drop-shadow-md">
+            <div className="flex gap-5 items-start bg-slate-900/50 backdrop-blur-md p-5 rounded-xl border-l-4 border-sky-500 shadow-xl">
+              <div className="bg-sky-500/20 p-3 rounded-full border border-sky-500/40 text-sky-400 drop-shadow-md">
                 <svg className="w-10 h-10" viewBox="0 0 24 24" fill="currentColor">
-                   <path d="M12 2C6.5 2 2 4.5 2 7v10c0 2.5 4.5 5 10 5s10-2.5 10-5V7c0-2.5-4.5-5-10-5zm0 18c-4.4 0-8-2.2-8-4V9.6c2.1 1.5 5 2.4 8 2.4s5.9-.9 8-2.4V16c0 1.8-3.6 4-8 4zm0-9c-4.4 0-8-1.8-8-4s3.6-4 8-4 8 1.8 8 4-3.6 4-8 4z"/>
+                   <path d="M12 2C6.5 2 2 4.5 2 7v10c0 2.5 4.5 5 10 5s10-2.5 10-5V7c0-2.5-4.5-5-10-5zm0 18c-4.4 0-8-2.2-8-4V9.6c2.1 1.5 5 2.4 8 2.4s5.9-.9 8-2.4V16c0 1.8-3.6 4-8 4zm0-9c-4.4 0-8-1.8-8-4s3.6-4 8-4 8 1.8 8 4-3.6 4-8 4 z"/>
                 </svg>
               </div>
               <div>
                 <h4 className="font-bold text-white text-lg uppercase">Post-Partido y Retorno</h4>
-                <p className="text-slate-300 text-sm mt-1">Al término del partido hacemos un punto de encuentro cercano al Cilindro para esperar el colectivo y pegamos la vuelta.</p>
+                <p className="text-slate-200 text-sm mt-1 font-medium drop-shadow-sm">Al término del partido hacemos un punto de encuentro cercano al Cilindro para esperar el colectivo y pegamos la vuelta.</p>
               </div>
             </div>
             
-            <p className="text-center text-sm text-sky-300 font-bold pt-4 bg-slate-950/60 p-3 rounded-xl border border-slate-700/50 shadow-md">
+            <p className="text-center text-sm text-sky-300 font-bold pt-4 bg-slate-950/50 p-3 rounded-xl border border-white/10 shadow-md backdrop-blur-sm">
               📱 Grupo de WhatsApp activo durante todo el viaje para cualquier duda.
             </p>
           </div>
         </section>
 
+        {/* PANTALLA 4 */}
         <section className="min-h-[70svh] flex flex-col items-center justify-center p-6 text-center">
-          <div className="bg-slate-900/85 backdrop-blur-xl p-10 rounded-3xl border-2 border-sky-500/30 w-full max-w-3xl shadow-2xl">
+          <div className="bg-slate-900/50 backdrop-blur-md p-10 rounded-3xl border-2 border-sky-500/30 w-full max-w-3xl shadow-2xl">
             <h2 className="text-3xl font-bold text-white uppercase mb-10">Métodos de Pago</h2>
             
             <div className="flex flex-wrap justify-center items-center gap-10 mb-10">
@@ -276,37 +284,38 @@ export default function ViajeFilialPage() {
                 <div className="bg-white p-1 rounded-xl shadow-[0_0_15px_rgba(56,189,248,0.3)]">
                   <img src="/logos/Logomp.jfif" alt="Mercado Pago" className="h-14 md:h-16 rounded-lg object-cover" />
                 </div>
-                <span className="text-xs uppercase text-slate-300 font-bold tracking-widest font-sans">Mercado Pago</span>
+                <span className="text-xs uppercase text-slate-200 font-bold tracking-widest font-sans">Mercado Pago</span>
               </div>
 
               <div className="flex flex-col items-center gap-3">
-                <div className="h-16 w-16 bg-gradient-to-br from-slate-700 to-slate-900 rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(56,189,248,0.3)] border border-sky-500/40 text-sky-400">
+                <div className="h-16 w-16 bg-slate-900/80 rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(56,189,248,0.3)] border border-sky-500/40 text-sky-400">
                   <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m4 6H4m0 0l4 4m-4-4l4-4" />
                   </svg>
                 </div>
-                <span className="text-xs uppercase text-slate-300 font-bold tracking-widest font-sans">Transferencias</span>
+                <span className="text-xs uppercase text-slate-200 font-bold tracking-widest font-sans">Transferencias</span>
               </div>
 
               <div className="flex flex-col items-center gap-3">
-                <div className="h-16 w-16 bg-gradient-to-br from-slate-700 to-slate-900 rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(56,189,248,0.3)] border border-sky-500/40 text-sky-400">
+                <div className="h-16 w-16 bg-slate-900/80 rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(56,189,248,0.3)] border border-sky-500/40 text-sky-400">
                   <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V11.75M3.75 5.25h16.5m-16.5 0a2.25 2.25 0 00-2.25 2.25v10.5a2.25 2.25 0 002.25 2.25m16.5-15a2.25 2.25 0 012.25 2.25v10.5a2.25 2.25 0 01-2.25 2.25m-12-7.5h.008v.008H8.25v-.008z" />
                   </svg>
                 </div>
-                <span className="text-xs uppercase text-slate-300 font-bold tracking-widest font-sans">Efectivo</span>
+                <span className="text-xs uppercase text-slate-200 font-bold tracking-widest font-sans">Efectivo</span>
               </div>
             </div>
 
-            <div className="bg-sky-950/50 p-4 rounded-xl border border-sky-500/40 inline-block">
+            <div className="bg-sky-950/60 p-4 rounded-xl border border-sky-500/40 inline-block backdrop-blur-sm">
               <p className="text-2xl md:text-3xl text-sky-400 font-black uppercase mb-1 drop-shadow-md">Hasta 2 cuotas</p>
-              <p className="text-slate-300 text-sm font-sans font-medium">Comunicate y resolvemos cualquier consulta sobre los pagos.</p>
+              <p className="text-slate-200 text-sm font-sans font-medium">Comunicate y resolvemos cualquier consulta sobre los pagos.</p>
             </div>
           </div>
         </section>
 
+        {/* PANTALLA 5 */}
         <section className="min-h-[100svh] flex flex-col items-center justify-center p-4 pb-20">
-          <div className="max-w-md w-full bg-slate-900/90 backdrop-blur-2xl rounded-2xl p-6 md:p-8 shadow-[0_0_30px_rgba(0,0,0,0.8)] border border-sky-500/50">
+          <div className="max-w-md w-full bg-slate-900/55 backdrop-blur-xl rounded-2xl p-6 md:p-8 shadow-[0_0_30px_rgba(0,0,0,0.8)] border border-sky-500/40">
             
             <div className="text-center mb-6 flex flex-col items-center">
               <div className="bg-white rounded-full p-2 shadow-[0_0_20px_rgba(56,189,248,0.6)] mb-4 inline-block border-2 border-sky-400">
@@ -315,7 +324,7 @@ export default function ViajeFilialPage() {
               <h2 className="text-2xl font-black text-sky-400 uppercase tracking-wide drop-shadow-md">
                 Reservá tu Pasaje
               </h2>
-              <p className="text-sm text-slate-200 mt-1 font-sans font-semibold">Completá los datos y enviáselo a Jony</p>
+              <p className="text-sm text-slate-100 mt-1 font-sans font-semibold drop-shadow">Completá los datos y enviáselo a Jony</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4 font-sans">
@@ -324,7 +333,7 @@ export default function ViajeFilialPage() {
                 <input
                   type="text"
                   required
-                  className="w-full bg-slate-800/80 border border-slate-600 rounded-lg p-3 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none text-white transition-all shadow-inner"
+                  className="w-full bg-slate-950/70 border border-slate-600 rounded-lg p-3 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none text-white transition-all shadow-inner"
                   onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
                 />
               </div>
@@ -335,18 +344,18 @@ export default function ViajeFilialPage() {
                   <input
                     type="text"
                     required
-                    className="w-full bg-slate-800/80 border border-slate-600 rounded-lg p-3 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none text-white transition-all shadow-inner"
+                    className="w-full bg-slate-950/70 border border-slate-600 rounded-lg p-3 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none text-white transition-all shadow-inner"
                     onChange={(e) => setFormData({ ...formData, dniSocio: e.target.value })}
                   />
                 </div>
                 <div>
                   <label className="block text-xs text-sky-200 mb-1 font-bold uppercase tracking-wider">Condición</label>
                   <select
-                    className="w-full bg-slate-800/80 border border-slate-600 rounded-lg p-3 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none text-white transition-all shadow-inner"
+                    className="w-full bg-slate-950/70 border border-slate-600 rounded-lg p-3 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none text-white transition-all shadow-inner"
                     onChange={(e) => setFormData({ ...formData, socioRacing: e.target.value })}
                   >
-                    <option value="Socio de Racing Avellaneda">Socio Racing</option>
-                    <option value="No Socio">No Socio</option>
+                    <option value="Socio de Racing Avellaneda" className="bg-slate-900">Socio Racing</option>
+                    <option value="No Socio" className="bg-slate-900">No Socio</option>
                   </select>
                 </div>
               </div>
@@ -354,12 +363,12 @@ export default function ViajeFilialPage() {
               <div>
                 <label className="block text-xs text-sky-200 mb-1 font-bold uppercase tracking-wider">Método de Pago</label>
                 <select
-                  className="w-full bg-slate-800/80 border border-slate-600 rounded-lg p-3 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none text-white transition-all shadow-inner"
+                  className="w-full bg-slate-950/70 border border-slate-600 rounded-lg p-3 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none text-white transition-all shadow-inner"
                   onChange={(e) => setFormData({ ...formData, pago: e.target.value })}
                 >
-                  <option value="Efectivo">Efectivo</option>
-                  <option value="Transferencia">Transferencia</option>
-                  <option value="En 2 Cuotas">En 2 Cuotas</option>
+                  <option value="Efectivo" className="bg-slate-900">Efectivo</option>
+                  <option value="Transferencia" className="bg-slate-900">Transferencia</option>
+                  <option value="En 2 Cuotas" className="bg-slate-900">En 2 Cuotas</option>
                 </select>
               </div>
 
@@ -371,7 +380,7 @@ export default function ViajeFilialPage() {
                   maxLength={140}
                   rows={3}
                   placeholder="Indicanos si viajás con alguien, dudas..."
-                  className="w-full bg-slate-800/80 border border-slate-600 rounded-lg p-3 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none text-white resize-none transition-all shadow-inner"
+                  className="w-full bg-slate-950/70 border border-slate-600 rounded-lg p-3 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none text-white resize-none transition-all shadow-inner"
                   onChange={(e) => setFormData({ ...formData, aclaraciones: e.target.value })}
                 />
               </div>
@@ -386,8 +395,8 @@ export default function ViajeFilialPage() {
           </div>
         </section>
 
-        {/* FOOTER: Ajustado para logo transparente sin fondo blanco */}
-        <footer className="w-full bg-slate-950 border-t-4 border-slate-900 p-8 text-center text-xs font-sans relative z-10 shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
+        {/* FOOTER */}
+        <footer className="w-full bg-slate-950/90 backdrop-blur-md border-t-4 border-slate-900 p-8 text-center text-xs font-sans relative z-10 shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
           <div className="max-w-xl mx-auto flex flex-col items-center gap-5">
             
             <div className="flex flex-col items-center gap-4">
@@ -405,11 +414,11 @@ export default function ViajeFilialPage() {
               </div>
             </div>
 
-            <p className="text-xs md:text-sm text-slate-400 mt-2 max-w-sm leading-relaxed font-medium">
+            <p className="text-xs md:text-sm text-slate-300 mt-2 max-w-sm leading-relaxed font-medium drop-shadow">
               Desarrollamos soluciones digitales, plataformas y sistemas de gestión a medida.
             </p>
 
-            <div className="flex flex-wrap justify-center gap-x-6 gap-y-3 text-slate-300 font-semibold text-xs mt-3">
+            <div className="flex flex-wrap justify-center gap-x-6 gap-y-3 text-slate-200 font-semibold text-xs mt-3">
               <span className="flex items-center gap-2">
                 <svg className="w-4 h-4 text-sky-400" fill="currentColor" viewBox="0 0 24 24"><path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"/></svg>
                 Soberanía Digital
