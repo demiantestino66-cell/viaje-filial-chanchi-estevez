@@ -13,7 +13,6 @@ const IMAGENES = [
   '/galeria/Foto5.jpg',
 ];
 
-// Se agregaron los 4 audios a la lista de reproducción
 const AUDIOS = [
   '/audio/Audio.mp3',
   '/audio/Audio1.mp3',
@@ -30,10 +29,13 @@ export default function ViajeFilialPage() {
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
+  // Estados para la nueva barra superior
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+
   const [timeLeftSalida, setTimeLeftSalida] = useState({ d: 0, h: 0, m: 0, s: 0 });
   const [timeLeftPartido, setTimeLeftPartido] = useState({ d: 0, h: 0, m: 0, s: 0 });
 
-  // Estado del formulario actualizado con todos los campos nuevos
   const [formData, setFormData] = useState({
     nombre: '',
     dniSocio: '',
@@ -73,7 +75,7 @@ export default function ViajeFilialPage() {
     return () => clearInterval(interval);
   }, []);
 
-  // Control estricto del reproductor cíclico de audio
+  // Control estricto del reproductor cíclico
   useEffect(() => {
     const audioEl = audioRef.current;
     if (!audioEl) return;
@@ -119,7 +121,6 @@ export default function ViajeFilialPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // WhatsApp Jony Filial
     const PHONE_JONY = "5492804588309";
     const mensaje = `¡Hola Filial! Quiero reservar mi lugar para el viaje:\n\n` +
       `*Nombre y Apellido:* ${formData.nombre}\n` +
@@ -138,13 +139,81 @@ export default function ViajeFilialPage() {
       
       <audio ref={audioRef} src={AUDIOS[currentAudioIndex]} preload="auto" />
 
-      {/* Botón de Música */}
-      <button 
-        onClick={togglePlayAudio}
-        className="fixed top-6 left-6 z-50 bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold px-4 py-2 rounded-full shadow-[0_0_20px_rgba(56,189,248,0.6)] flex items-center gap-2 border-2 border-white transition-all duration-300 animate-pulse text-xs uppercase tracking-wider cursor-pointer"
-      >
-        <span>{isPlaying ? '🔊 Música ON' : '🔇 Reproducir Música'}</span>
-      </button>
+      {/* ENCABEZADO / NAVBAR SUPERIOR FIJO */}
+      <header className="fixed top-0 left-0 w-full z-[60] bg-slate-950/80 backdrop-blur-md border-b border-sky-500/30 shadow-[0_4px_30px_rgba(0,0,0,0.5)]">
+        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+          
+          {/* Lado Izquierdo: Logo y Música Integrados */}
+          <div className="flex items-center gap-3">
+            <img src="/logos/Logo2.png" alt="Escudo Filial" className="h-10 w-10 object-contain drop-shadow-[0_0_10px_rgba(56,189,248,0.5)]" />
+            <button 
+              onClick={togglePlayAudio}
+              className="bg-sky-500/20 border border-sky-500/50 hover:bg-sky-500/40 text-sky-400 font-bold px-3 py-1.5 rounded-full flex items-center gap-2 transition-all duration-300 text-[10px] uppercase tracking-wider"
+            >
+              <span>{isPlaying ? '🔊 Música ON' : '🔇 Play'}</span>
+            </button>
+          </div>
+
+          {/* Lado Derecho: Botón Menú */}
+          <button 
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="text-white hover:text-sky-400 p-2 transition-colors flex items-center gap-2 bg-slate-800/50 rounded-lg border border-white/10"
+          >
+            <span className="text-xs uppercase font-bold tracking-widest hidden sm:block text-sky-200">Menú</span>
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={isMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} /></svg>
+          </button>
+        </div>
+
+        {/* MENÚ DESPLEGABLE */}
+        <div className={`absolute top-16 left-0 w-full bg-slate-900/95 backdrop-blur-xl border-b border-sky-500/30 transition-all duration-300 overflow-hidden ${isMenuOpen ? 'max-h-96 py-6' : 'max-h-0 py-0'} shadow-2xl`}>
+          <nav className="flex flex-col items-center gap-2 text-sm uppercase tracking-widest font-sans font-bold px-4">
+            
+            <a href="https://www.racingclub.com.ar/" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 text-slate-200 hover:text-sky-400 transition-colors w-full py-3 bg-slate-800/30 rounded-lg">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              Sitio Oficial Racing
+            </a>
+            
+            <a href="https://racingpass.racingclub.com.ar/" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 text-slate-200 hover:text-sky-400 transition-colors w-full py-3 bg-slate-800/30 rounded-lg">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/></svg>
+              Racing Pass
+            </a>
+
+            <a href="https://locademia.racingclub.com.ar/" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 text-slate-200 hover:text-sky-400 transition-colors w-full py-3 bg-slate-800/30 rounded-lg">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+              Tienda Locademia
+            </a>
+            
+            <div className="w-3/4 h-px bg-slate-700/50 my-2"></div>
+            
+            <button 
+              onClick={() => { setShowModal(true); setIsMenuOpen(false); }}
+              className="bg-sky-500 text-slate-950 px-6 py-3 rounded-xl flex items-center justify-center gap-2 hover:bg-sky-400 shadow-[0_0_15px_rgba(56,189,248,0.4)] w-full transition-all"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+              Ingreso Socios Filial
+            </button>
+          </nav>
+        </div>
+      </header>
+
+      {/* MODAL EN CONSTRUCCIÓN (Z-Index alto para tapar todo) */}
+      {showModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md" onClick={() => setShowModal(false)}>
+          <div className="bg-slate-900 border border-sky-500/50 p-8 rounded-2xl max-w-sm w-full text-center shadow-[0_0_40px_rgba(56,189,248,0.3)] animate-pulse" onClick={e => e.stopPropagation()}>
+            <div className="mx-auto w-16 h-16 bg-sky-500/20 text-sky-400 rounded-full flex items-center justify-center mb-4 border border-sky-500/50 shadow-inner">
+              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+            </div>
+            <h3 className="text-xl font-bold text-white uppercase tracking-wider mb-2">Área en Construcción</h3>
+            <p className="text-slate-300 text-sm font-sans mb-6 font-medium">Próximamente: Club de beneficios locales, credencial digital y autogestión exclusiva para Socios de la Filial Trelew.</p>
+            <button 
+              onClick={() => setShowModal(false)}
+              className="bg-sky-500 hover:bg-sky-400 text-slate-950 font-black w-full py-3 rounded-lg uppercase tracking-widest text-sm transition-colors shadow-lg"
+            >
+              Volver al Inicio
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Slider de Fondo */}
       <div className="fixed inset-0 z-0 pointer-events-none bg-slate-950">
@@ -160,16 +229,11 @@ export default function ViajeFilialPage() {
         <div className="absolute inset-0 bg-gradient-to-b from-slate-950/40 via-slate-950/30 to-slate-950/50" />
       </div>
 
-      {/* Logo Flotante Filial */}
-      <div className="fixed top-6 right-6 z-50 pointer-events-none animate-bounce duration-1000">
-        <img src="/logos/Logo2.png" alt="Escudo Alternativo" className="w-14 h-14 md:w-20 md:h-20 object-contain drop-shadow-[0_0_15px_rgba(56,189,248,0.8)]" />
-      </div>
-
-      <div className="relative z-10">
+      <div className="relative z-10 pt-16">
         
         {/* PANTALLA 1: HERO & CONTADORES */}
-        <section className="min-h-[100svh] flex flex-col items-center justify-center p-6 text-center space-y-8">
-          <div className="bg-slate-950/30 p-4 rounded-2xl backdrop-blur-[2px] border border-white/10">
+        <section className="min-h-[100svh] flex flex-col items-center justify-center p-6 text-center space-y-8 pb-20">
+          <div className="bg-slate-950/30 p-4 rounded-2xl backdrop-blur-[2px] border border-white/10 mt-8">
             <h1 className="text-4xl md:text-6xl font-bold text-sky-400 uppercase drop-shadow-[0_4px_10px_rgba(0,0,0,0.9)] mb-2">
               Nos vamos al Cilindro
             </h1>
@@ -206,9 +270,6 @@ export default function ViajeFilialPage() {
                 <p className="text-xs text-slate-100 mt-2 font-sans font-medium drop-shadow">18 de Octubre, 17:30 HS (A confirmar)</p>
               </div>
             </div>
-          </div>
-          <div className="absolute bottom-8 animate-bounce text-sky-400 opacity-90 bg-slate-900/40 rounded-full p-2 backdrop-blur-sm">
-            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
           </div>
         </section>
 
