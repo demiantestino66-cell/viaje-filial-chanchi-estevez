@@ -285,17 +285,18 @@ export default function ViajeFilialPage() {
           </div>
         </section>
 
-        {/* PANTALLA 3: ITINERARIO */}
+        {/* PANTALLA 3: ITINERARIO COMPLETO RECUPERADO */}
         <section className="min-h-[100svh] flex flex-col items-center justify-center p-6 w-full">
           <h2 className="text-4xl md:text-5xl font-bold text-sky-400 uppercase mb-10 text-center drop-shadow-[0_4px_10px_rgba(0,0,0,0.9)] bg-slate-950/40 backdrop-blur-sm p-3 rounded-xl border border-white/10">Itinerario del Viaje</h2>
           <div className="max-w-2xl w-full space-y-5 font-sans">
+            
             <div className="flex gap-5 items-start bg-slate-900/50 backdrop-blur-md p-5 rounded-xl border-l-4 border-sky-500 shadow-xl">
               <div className="bg-sky-500/20 p-3 rounded-full border border-sky-500/40 text-sky-400 drop-shadow-md">
                 <svg className="w-10 h-10" viewBox="0 0 24 24" fill="currentColor"><path d="M4 16c0 .88.39 1.67 1 2.22v1.28c0 .83.67 1.5 1.5 1.5S8 20.33 8 19.5V19h8v.5c0 .82.67 1.5 1.5 1.5.82 0 1.5-.68 1.5-1.5v-1.28c.61-.55 1-1.34 1-2.22V6c0-3.5-3.58-4-8-4s-8 .5-8 4v10zm3.5 1c-.83 0-1.5-.67-1.5-1.5S6.67 14 7.5 14s1.5.67 1.5 1.5S8.33 17 7.5 17zm9 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-6H6V7h12v4z"/></svg>
               </div>
               <div>
                 <h4 className="font-bold text-white text-lg uppercase">Salida desde Trelew</h4>
-                <p className="text-slate-200 text-sm mt-1 font-medium drop-shadow-sm">Día 17 a las 12:00 PM. Bombos, canciones y mucho más.</p>
+                <p className="text-slate-200 text-sm mt-1 font-medium drop-shadow-sm">Día 17 a las 12:00 PM. Bombos, canciones y mucho más para compartir una experiencia única.</p>
               </div>
             </div>
             
@@ -305,7 +306,7 @@ export default function ViajeFilialPage() {
               </div>
               <div>
                 <h4 className="font-bold text-white text-lg uppercase">Predio Tita (A confirmar)</h4>
-                <p className="text-slate-200 text-sm mt-1 font-medium drop-shadow-sm">Comemos y compartimos en los fogones.</p>
+                <p className="text-slate-200 text-sm mt-1 font-medium drop-shadow-sm">Llegamos, comemos y compartimos en los fogones en la previa del partido.</p>
               </div>
             </div>
 
@@ -314,10 +315,25 @@ export default function ViajeFilialPage() {
                 <svg className="w-10 h-10" viewBox="0 0 24 24" fill="currentColor"><path d="M22,10V6A2,2 0 0,0 20,4H4A2,2 0 0,0 2,6V10C3.11,10 4,10.9 4,12C4,13.11 3.11,14 2,14V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V14C20.89,14 20,13.11 20,12C20,10.9 20.89,10 22,10M11,15H9V13H11V15M11,11H9V9H11V11M15,15H13V13H15V15M15,11H13V9H15V11Z"/></svg>
               </div>
               <div>
-                <h4 className="font-bold text-white text-lg uppercase">Entradas y Caminata</h4>
-                <p className="text-slate-200 text-sm mt-1 font-medium drop-shadow-sm">Entrega de credenciales y caminata grupal.</p>
+                <h4 className="font-bold text-white text-lg uppercase">Entradas y Credenciales</h4>
+                <p className="text-slate-200 text-sm mt-1 font-medium drop-shadow-sm">Entrega de entradas y organización. Caminata hasta el Cilindro en grupos consolidados.</p>
               </div>
             </div>
+
+            <div className="flex gap-5 items-start bg-slate-900/50 backdrop-blur-md p-5 rounded-xl border-l-4 border-sky-500 shadow-xl">
+              <div className="bg-sky-500/20 p-3 rounded-full border border-sky-500/40 text-sky-400 drop-shadow-md">
+                <svg className="w-10 h-10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.5 2 2 4.5 2 7v10c0 2.5 4.5 5 10 5s10-2.5 10-5V7c0-2.5-4.5-5-10-5zm0 18c-4.4 0-8-2.2-8-4V9.6c2.1 1.5 5 2.4 8 2.4s5.9-.9 8-2.4V16c0 1.8-3.6 4-8 4zm0-9c-4.4 0-8-1.8-8-4s3.6-4 8-4 8 1.8 8 4-3.6 4-8 4z"/></svg>
+              </div>
+              <div>
+                <h4 className="font-bold text-white text-lg uppercase">Post-Partido y Retorno</h4>
+                <p className="text-slate-200 text-sm mt-1 font-medium drop-shadow-sm">Al término del partido hacemos un punto de encuentro cercano al Cilindro para esperar el colectivo y pegamos la vuelta.</p>
+              </div>
+            </div>
+            
+            <p className="text-center text-sm text-sky-300 font-bold pt-4 bg-slate-950/50 p-3 rounded-xl border border-white/10 shadow-md backdrop-blur-sm">
+              📱 Grupo de WhatsApp activo durante todo el viaje para cualquier duda.
+            </p>
+
           </div>
         </section>
 
@@ -410,7 +426,7 @@ export default function ViajeFilialPage() {
           </div>
         </section>
 
-        {/* FOOTER: TOTALMENTE RECUPERADO CON DATOS EDITORIAL */}
+        {/* FOOTER */}
         <footer className="w-full bg-slate-950/90 backdrop-blur-md border-t-4 border-slate-900 p-8 text-center text-xs font-sans relative z-10 shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
           <div className="max-w-xl mx-auto flex flex-col items-center gap-5">
             
@@ -433,7 +449,6 @@ export default function ViajeFilialPage() {
               Desarrollamos soluciones digitales, plataformas y sistemas de gestión a medida.
             </p>
 
-            {/* Aca están de vuelta todos tus links y contactos intactos */}
             <div className="flex flex-wrap justify-center gap-x-6 gap-y-3 text-slate-200 font-semibold text-xs mt-3">
               <span className="flex items-center gap-2">
                 <svg className="w-4 h-4 text-sky-400" fill="currentColor" viewBox="0 0 24 24"><path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"/></svg>
