@@ -59,7 +59,7 @@ export default function ViajeFilialPage() {
     return () => clearInterval(timer);
   }, []);
 
-  // Rotación de imágenes
+  // Rotación de imágenes de fondo
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentImg((prev) => (prev + 1) % IMAGENES.length);
@@ -73,7 +73,6 @@ export default function ViajeFilialPage() {
     if (!audioEl) return;
 
     const handleEnded = () => {
-      // Pasa al siguiente audio en bucle infinito (0 -> 1 -> 0 -> 1...)
       setCurrentAudioIndex((prevIndex) => {
         const nextIndex = (prevIndex + 1) % AUDIOS.length;
         return nextIndex;
@@ -86,7 +85,6 @@ export default function ViajeFilialPage() {
     };
   }, []);
 
-  // Cada vez que cambia el índice de audio, cargamos la pista y damos play si estaba activo
   useEffect(() => {
     const audioEl = audioRef.current;
     if (!audioEl) return;
@@ -115,8 +113,9 @@ export default function ViajeFilialPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    // WhatsApp Jony Filial
     const PHONE_JONY = "5492804588309";
-    const mensaje = `¡Hola Jony! Quiero reservar mi lugar para el viaje de la Filial:\n\n` +
+    const mensaje = `¡Hola Filial! Quiero reservar mi lugar para el viaje:\n\n` +
       `*Nombre y Apellido:* ${formData.nombre}\n` +
       `*DNI / N° Socio:* ${formData.dniSocio}\n` +
       `*Condición:* ${formData.socioRacing}\n` +
@@ -129,10 +128,9 @@ export default function ViajeFilialPage() {
   return (
     <main className={`relative w-full bg-slate-950 text-white overflow-x-hidden ${oswald.className} scroll-smooth`}>
       
-      {/* Elemento de audio nativo controlado por estado */}
       <audio ref={audioRef} src={AUDIOS[currentAudioIndex]} preload="auto" />
 
-      {/* Botón flotante de control de música */}
+      {/* Botón de Música */}
       <button 
         onClick={togglePlayAudio}
         className="fixed top-6 left-6 z-50 bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold px-4 py-2 rounded-full shadow-[0_0_20px_rgba(56,189,248,0.6)] flex items-center gap-2 border-2 border-white transition-all duration-300 animate-pulse text-xs uppercase tracking-wider cursor-pointer"
@@ -140,7 +138,7 @@ export default function ViajeFilialPage() {
         <span>{isPlaying ? '🔊 Música ON' : '🔇 Reproducir Música'}</span>
       </button>
 
-      {/* Fondos */}
+      {/* Slider de Fondo */}
       <div className="fixed inset-0 z-0 pointer-events-none bg-slate-950">
         {IMAGENES.map((img, index) => (
           <div
@@ -154,11 +152,13 @@ export default function ViajeFilialPage() {
         <div className="absolute inset-0 bg-gradient-to-b from-slate-950/40 via-slate-950/30 to-slate-950/50" />
       </div>
 
+      {/* Logo Flotante Filial */}
       <div className="fixed top-6 right-6 z-50 pointer-events-none animate-bounce duration-1000">
         <img src="/logos/Logo2.png" alt="Escudo Alternativo" className="w-14 h-14 md:w-20 md:h-20 object-contain drop-shadow-[0_0_15px_rgba(56,189,248,0.8)]" />
       </div>
 
       <div className="relative z-10">
+        
         {/* PANTALLA 1: HERO & CONTADORES */}
         <section className="min-h-[100svh] flex flex-col items-center justify-center p-6 text-center space-y-8">
           <div className="bg-slate-950/30 p-4 rounded-2xl backdrop-blur-[2px] border border-white/10">
@@ -331,7 +331,25 @@ export default function ViajeFilialPage() {
           </div>
         </section>
 
-        {/* PANTALLA 5: FORMULARIO */}
+        {/* PANTALLA 5: PLACA COMUNICADO RACING PASS */}
+        <section className="min-h-[100svh] flex flex-col items-center justify-center p-6 text-center space-y-6">
+          <div className="bg-slate-950/40 backdrop-blur-sm p-3 rounded-xl border border-white/10 mb-2 shadow-lg">
+            <h2 className="text-3xl md:text-4xl font-bold text-sky-400 uppercase drop-shadow-[0_4px_10px_rgba(0,0,0,0.9)] tracking-wider">
+              Comunicado Oficial
+            </h2>
+          </div>
+          
+          <div className="max-w-md w-full bg-slate-900/50 backdrop-blur-xl p-4 rounded-3xl border-2 border-sky-500/40 shadow-[0_0_30px_rgba(0,0,0,0.8)] transition-transform hover:scale-[1.02] duration-300">
+            {/* Imagen del flyer (Foto6.png) con bordes redondeados y adaptada al marco */}
+            <img 
+              src="/galeria/Foto6.png" 
+              alt="Comunicado Filial Trelew Racing Pass" 
+              className="w-full h-auto rounded-2xl object-cover shadow-lg border border-sky-500/20" 
+            />
+          </div>
+        </section>
+
+        {/* PANTALLA 6: FORMULARIO FINAL */}
         <section className="min-h-[100svh] flex flex-col items-center justify-center p-4 pb-20">
           <div className="max-w-md w-full bg-slate-900/55 backdrop-blur-xl rounded-2xl p-6 md:p-8 shadow-[0_0_30px_rgba(0,0,0,0.8)] border border-sky-500/40">
             
@@ -342,7 +360,10 @@ export default function ViajeFilialPage() {
               <h2 className="text-2xl font-black text-sky-400 uppercase tracking-wide drop-shadow-md">
                 Reservá tu Pasaje
               </h2>
-              <p className="text-sm text-slate-100 mt-1 font-sans font-semibold drop-shadow">Completá los datos y enviáselo a Jony</p>
+              {/* CAMBIO 1 APLICADO AQUÍ */}
+              <p className="text-sm text-slate-100 mt-1 font-sans font-semibold drop-shadow">
+                Completá el Formulario y enviáselo a la filial
+              </p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4 font-sans">
@@ -403,11 +424,12 @@ export default function ViajeFilialPage() {
                 />
               </div>
 
+              {/* CAMBIO 2 APLICADO AQUÍ */}
               <button
                 type="submit"
                 className="w-full bg-sky-500 hover:bg-sky-400 text-slate-950 font-black py-4 rounded-lg shadow-[0_0_20px_rgba(56,189,248,0.4)] hover:shadow-[0_0_30px_rgba(56,189,248,0.6)] transition duration-300 mt-4 uppercase tracking-widest text-lg cursor-pointer"
               >
-                Enviar Reserva a Jony
+                Enviar Reserva a Filial
               </button>
             </form>
           </div>
