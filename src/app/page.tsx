@@ -21,25 +21,6 @@ const AUDIOS = [
 const FECHA_SALIDA = new Date('2026-10-17T12:00:00');
 const FECHA_PARTIDO = new Date('2026-10-18T17:30:00');
 
-const PREGUNTAS_FRECUENTES = [
-  {
-    q: "¿Necesito ser socio del club para viajar?",
-    a: "No es obligatorio, pero los socios de Racing Avellaneda tienen un precio diferencial más económico. Si no sos socio, podés viajar igual abonando la tarifa general."
-  },
-  {
-    q: "¿Qué incluye el valor del pasaje?",
-    a: "El valor incluye el viaje ida y vuelta en unidad semicama, coordinación constante, y la previa en el predio (a confirmar). Las entradas se gestionan aparte pero te ayudamos con el trámite."
-  },
-  {
-    q: "¿Se puede pagar en cuotas?",
-    a: "Sí, aceptamos hasta 2 cuotas. Te recomendamos contactar a Jony por WhatsApp enviando el formulario para coordinar las fechas de pago."
-  },
-  {
-    q: "¿A qué hora y de dónde salimos?",
-    a: "Salimos el 17 de Octubre a las 12:00 PM desde el playón de La Anónima (Colombia y Av. Trabajadores, Trelew)."
-  }
-];
-
 export default function ViajeFilialPage() {
   const [currentImg, setCurrentImg] = useState(0);
   const [currentAudioIndex, setCurrentAudioIndex] = useState(0);
@@ -49,7 +30,6 @@ export default function ViajeFilialPage() {
   // Estados para Navbar y Modales
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   const [timeLeftSalida, setTimeLeftSalida] = useState({ d: 0, h: 0, m: 0, s: 0 });
   const [timeLeftPartido, setTimeLeftPartido] = useState({ d: 0, h: 0, m: 0, s: 0 });
@@ -74,10 +54,12 @@ export default function ViajeFilialPage() {
         s: Math.floor((diff / 1000) % 60)
       };
     };
+
     const timer = setInterval(() => {
       setTimeLeftSalida(calculateTime(FECHA_SALIDA));
       setTimeLeftPartido(calculateTime(FECHA_PARTIDO));
     }, 1000);
+
     return () => clearInterval(timer);
   }, []);
 
@@ -89,20 +71,28 @@ export default function ViajeFilialPage() {
     return () => clearInterval(interval);
   }, []);
 
-  // Control estricto del reproductor cíclico
+  // Control estricto del reproductor cíclico de audio
   useEffect(() => {
     const audioEl = audioRef.current;
     if (!audioEl) return;
+
     const handleEnded = () => {
-      setCurrentAudioIndex((prevIndex) => (prevIndex + 1) % AUDIOS.length);
+      setCurrentAudioIndex((prevIndex) => {
+        const nextIndex = (prevIndex + 1) % AUDIOS.length;
+        return nextIndex;
+      });
     };
+
     audioEl.addEventListener('ended', handleEnded);
-    return () => audioEl.removeEventListener('ended', handleEnded);
+    return () => {
+      audioEl.removeEventListener('ended', handleEnded);
+    };
   }, []);
 
   useEffect(() => {
     const audioEl = audioRef.current;
     if (!audioEl) return;
+
     audioEl.src = AUDIOS[currentAudioIndex];
     audioEl.load();
     if (isPlaying) {
@@ -118,13 +108,11 @@ export default function ViajeFilialPage() {
         setIsPlaying(false);
       } else {
         audioRef.current.volume = 0.5;
-        audioRef.current.play().then(() => setIsPlaying(true)).catch(() => {});
+        audioRef.current.play().then(() => {
+          setIsPlaying(true);
+        }).catch(() => {});
       }
     }
-  };
-
-  const toggleFaq = (index: number) => {
-    setOpenFaq(openFaq === index ? null : index);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -136,6 +124,7 @@ export default function ViajeFilialPage() {
       `*Condición:* ${formData.socioRacing}\n` +
       `*Método de Pago:* ${formData.pago}\n` +
       `*Aclaraciones:* ${formData.aclaraciones || 'Sin aclaraciones'}`;
+
     window.open(`https://wa.me/${PHONE_JONY}?text=${encodeURIComponent(mensaje)}`, '_blank');
   };
 
@@ -152,7 +141,6 @@ export default function ViajeFilialPage() {
         </div>
         
         <div className="flex items-center gap-4">
-          {/* Botón Área de Socios (Login) */}
           <button 
             onClick={() => setIsLoginModalOpen(true)}
             className="flex items-center gap-1 bg-sky-900/50 hover:bg-sky-800/60 border border-sky-500/50 text-white px-3 py-1.5 rounded-full transition-all text-xs font-sans tracking-wide"
@@ -161,7 +149,6 @@ export default function ViajeFilialPage() {
             <span className="hidden sm:block">Mi Perfil</span>
           </button>
           
-          {/* Botón Menú Hamburguesa */}
           <button 
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             className="text-sky-400 hover:text-white transition-colors p-1"
@@ -198,7 +185,6 @@ export default function ViajeFilialPage() {
           className="fixed inset-0 z-[70] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 cursor-pointer animate-in fade-in duration-200"
           onClick={() => setIsLoginModalOpen(false)}
         >
-          {/* Contenedor del Modal (detiene el click para que no cierre si tocas adentro, aunque acá queremos que cierre fácil, pero lo dejamos por buenas prácticas) */}
           <div 
             className="bg-gradient-to-br from-slate-800 to-slate-950 border-2 border-sky-500 rounded-3xl p-8 max-w-sm w-full text-center shadow-[0_0_40px_rgba(56,189,248,0.4)] cursor-default transform transition-all scale-100"
             onClick={(e) => e.stopPropagation()}
@@ -220,7 +206,7 @@ export default function ViajeFilialPage() {
         </div>
       )}
 
-      {/* Botones Flotantes (Bajados a top-20 para no chocar con Navbar) */}
+      {/* Botón Flotante Música */}
       <button 
         onClick={togglePlayAudio}
         className="fixed top-20 left-4 z-40 bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold px-3 py-1.5 rounded-full shadow-[0_0_15px_rgba(56,189,248,0.6)] flex items-center gap-2 border border-white transition-all duration-300 animate-pulse text-[10px] md:text-xs uppercase tracking-wider cursor-pointer"
@@ -228,11 +214,12 @@ export default function ViajeFilialPage() {
         <span>{isPlaying ? '🔊 Música ON' : '🔇 Reproducir'}</span>
       </button>
 
+      {/* Logo Secundario Flotante */}
       <div className="fixed top-20 right-4 z-40 pointer-events-none animate-bounce duration-1000">
         <img src="/logos/Logo2.png" alt="Escudo Alternativo" className="w-12 h-12 md:w-16 md:h-16 object-contain drop-shadow-[0_0_15px_rgba(56,189,248,0.8)]" />
       </div>
 
-      {/* Fondos */}
+      {/* Fondos Slider */}
       <div className="fixed inset-0 z-0 pointer-events-none bg-slate-950 pt-16">
         {IMAGENES.map((img, index) => (
           <div
@@ -246,9 +233,10 @@ export default function ViajeFilialPage() {
         <div className="absolute inset-0 bg-gradient-to-b from-slate-950/40 via-slate-950/30 to-slate-950/50" />
       </div>
 
+      {/* CONTENIDO PRINCIPAL */}
       <div className="relative z-10 pt-16">
         
-        {/* PANTALLAS 1 a 4 (Idénticas pero con fondo respetado) */}
+        {/* PANTALLA 1 */}
         <section className="min-h-[100svh] flex flex-col items-center justify-center p-6 text-center space-y-8">
           <div className="bg-slate-950/30 p-4 rounded-2xl backdrop-blur-[2px] border border-white/10">
             <h1 className="text-4xl md:text-6xl font-bold text-sky-400 uppercase drop-shadow-[0_4px_10px_rgba(0,0,0,0.9)] mb-2">Nos vamos al Cilindro</h1>
@@ -279,6 +267,7 @@ export default function ViajeFilialPage() {
           </div>
         </section>
 
+        {/* PANTALLA 2 */}
         <section className="min-h-[100svh] flex flex-col items-center justify-center p-6 text-center space-y-8">
           <div className="max-w-3xl w-full bg-slate-900/45 backdrop-blur-md rounded-3xl p-8 md:p-12 shadow-2xl border border-sky-500/35">
             <h2 className="text-3xl md:text-5xl font-bold text-white uppercase mb-4 leading-tight drop-shadow-md">Si sos socio de la Filial Chanchi Estévez <span className="text-sky-400">tenés beneficios siempre</span></h2>
@@ -296,62 +285,74 @@ export default function ViajeFilialPage() {
           </div>
         </section>
 
+        {/* PANTALLA 3: ITINERARIO */}
         <section className="min-h-[100svh] flex flex-col items-center justify-center p-6 w-full">
           <h2 className="text-4xl md:text-5xl font-bold text-sky-400 uppercase mb-10 text-center drop-shadow-[0_4px_10px_rgba(0,0,0,0.9)] bg-slate-950/40 backdrop-blur-sm p-3 rounded-xl border border-white/10">Itinerario del Viaje</h2>
           <div className="max-w-2xl w-full space-y-5 font-sans">
             <div className="flex gap-5 items-start bg-slate-900/50 backdrop-blur-md p-5 rounded-xl border-l-4 border-sky-500 shadow-xl">
-              <div className="bg-sky-500/20 p-3 rounded-full border border-sky-500/40 text-sky-400 drop-shadow-md"><svg className="w-10 h-10" viewBox="0 0 24 24" fill="currentColor"><path d="M4 16c0 .88.39 1.67 1 2.22v1.28c0 .83.67 1.5 1.5 1.5S8 20.33 8 19.5V19h8v.5c0 .82.67 1.5 1.5 1.5.82 0 1.5-.68 1.5-1.5v-1.28c.61-.55 1-1.34 1-2.22V6c0-3.5-3.58-4-8-4s-8 .5-8 4v10zm3.5 1c-.83 0-1.5-.67-1.5-1.5S6.67 14 7.5 14s1.5.67 1.5 1.5S8.33 17 7.5 17zm9 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-6H6V7h12v4z"/></svg></div>
-              <div><h4 className="font-bold text-white text-lg uppercase">Salida desde Trelew</h4><p className="text-slate-200 text-sm mt-1 font-medium drop-shadow-sm">Día 17 a las 12:00 PM. Bombos, canciones y mucho más.</p></div>
+              <div className="bg-sky-500/20 p-3 rounded-full border border-sky-500/40 text-sky-400 drop-shadow-md">
+                <svg className="w-10 h-10" viewBox="0 0 24 24" fill="currentColor"><path d="M4 16c0 .88.39 1.67 1 2.22v1.28c0 .83.67 1.5 1.5 1.5S8 20.33 8 19.5V19h8v.5c0 .82.67 1.5 1.5 1.5.82 0 1.5-.68 1.5-1.5v-1.28c.61-.55 1-1.34 1-2.22V6c0-3.5-3.58-4-8-4s-8 .5-8 4v10zm3.5 1c-.83 0-1.5-.67-1.5-1.5S6.67 14 7.5 14s1.5.67 1.5 1.5S8.33 17 7.5 17zm9 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-6H6V7h12v4z"/></svg>
+              </div>
+              <div>
+                <h4 className="font-bold text-white text-lg uppercase">Salida desde Trelew</h4>
+                <p className="text-slate-200 text-sm mt-1 font-medium drop-shadow-sm">Día 17 a las 12:00 PM. Bombos, canciones y mucho más.</p>
+              </div>
             </div>
+            
             <div className="flex gap-5 items-start bg-slate-900/50 backdrop-blur-md p-5 rounded-xl border-l-4 border-sky-500 shadow-xl">
-              <div className="bg-sky-500/20 p-3 rounded-full border border-sky-500/40 text-sky-400 drop-shadow-md"><svg className="w-10 h-10" viewBox="0 0 24 24" fill="currentColor"><path d="M22,18H2V20H22V18M13.84,13C12.8,11.23 12,8.85 12,6C12,8.85 11.2,11.23 10.16,13C8.61,15.65 6,15.93 6,15.93H18C18,15.93 15.39,15.65 13.84,13M21,11V13H19C19,10.61 17.57,8.5 15.42,7.56C17.06,7.18 18.25,5.63 18.25,3.75V3H19.75V3.75C19.75,4.72 20.53,5.5 21.5,5.5V7C20.08,7 18.84,7.84 18.37,9.08C19.92,9.35 21,10.05 21,11M5.75,3H4.25V3.75C4.25,5.63 5.44,7.18 7.08,7.56C4.93,8.5 3.5,10.61 3.5,13V11C3.5,10.05 4.58,9.35 6.13,9.08C5.66,7.84 4.42,7 3,7V5.5C3.97,5.5 4.75,4.72 4.75,3.75V3H5.75Z"/></svg></div>
-              <div><h4 className="font-bold text-white text-lg uppercase">Predio Tita (A confirmar)</h4><p className="text-slate-200 text-sm mt-1 font-medium drop-shadow-sm">Comemos y compartimos en los fogones.</p></div>
+              <div className="bg-sky-500/20 p-3 rounded-full border border-sky-500/40 text-sky-400 drop-shadow-md">
+                <svg className="w-10 h-10" viewBox="0 0 24 24" fill="currentColor"><path d="M22,18H2V20H22V18M13.84,13C12.8,11.23 12,8.85 12,6C12,8.85 11.2,11.23 10.16,13C8.61,15.65 6,15.93 6,15.93H18C18,15.93 15.39,15.65 13.84,13M21,11V13H19C19,10.61 17.57,8.5 15.42,7.56C17.06,7.18 18.25,5.63 18.25,3.75V3H19.75V3.75C19.75,4.72 20.53,5.5 21.5,5.5V7C20.08,7 18.84,7.84 18.37,9.08C19.92,9.35 21,10.05 21,11M5.75,3H4.25V3.75C4.25,5.63 5.44,7.18 7.08,7.56C4.93,8.5 3.5,10.61 3.5,13V11C3.5,10.05 4.58,9.35 6.13,9.08C5.66,7.84 4.42,7 3,7V5.5C3.97,5.5 4.75,4.72 4.75,3.75V3H5.75Z"/></svg>
+              </div>
+              <div>
+                <h4 className="font-bold text-white text-lg uppercase">Predio Tita (A confirmar)</h4>
+                <p className="text-slate-200 text-sm mt-1 font-medium drop-shadow-sm">Comemos y compartimos en los fogones.</p>
+              </div>
             </div>
+
             <div className="flex gap-5 items-start bg-slate-900/50 backdrop-blur-md p-5 rounded-xl border-l-4 border-sky-500 shadow-xl">
-              <div className="bg-sky-500/20 p-3 rounded-full border border-sky-500/40 text-sky-400 drop-shadow-md"><svg className="w-10 h-10" viewBox="0 0 24 24" fill="currentColor"><path d="M22,10V6A2,2 0 0,0 20,4H4A2,2 0 0,0 2,6V10C3.11,10 4,10.9 4,12C4,13.11 3.11,14 2,14V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V14C20.89,14 20,13.11 20,12C20,10.9 20.89,10 22,10M11,15H9V13H11V15M11,11H9V9H11V11M15,15H13V13H15V15M15,11H13V9H15V11Z"/></svg></div>
-              <div><h4 className="font-bold text-white text-lg uppercase">Entradas y Caminata</h4><p className="text-slate-200 text-sm mt-1 font-medium drop-shadow-sm">Entrega de credenciales y caminata grupal.</p></div>
+              <div className="bg-sky-500/20 p-3 rounded-full border border-sky-500/40 text-sky-400 drop-shadow-md">
+                <svg className="w-10 h-10" viewBox="0 0 24 24" fill="currentColor"><path d="M22,10V6A2,2 0 0,0 20,4H4A2,2 0 0,0 2,6V10C3.11,10 4,10.9 4,12C4,13.11 3.11,14 2,14V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V14C20.89,14 20,13.11 20,12C20,10.9 20.89,10 22,10M11,15H9V13H11V15M11,11H9V9H11V11M15,15H13V13H15V15M15,11H13V9H15V11Z"/></svg>
+              </div>
+              <div>
+                <h4 className="font-bold text-white text-lg uppercase">Entradas y Caminata</h4>
+                <p className="text-slate-200 text-sm mt-1 font-medium drop-shadow-sm">Entrega de credenciales y caminata grupal.</p>
+              </div>
             </div>
           </div>
         </section>
 
+        {/* PANTALLA 4: PAGOS */}
         <section className="min-h-[60svh] flex flex-col items-center justify-center p-6 text-center">
           <div className="bg-slate-900/50 backdrop-blur-md p-10 rounded-3xl border-2 border-sky-500/30 w-full max-w-3xl shadow-2xl">
             <h2 className="text-3xl font-bold text-white uppercase mb-10">Métodos de Pago</h2>
             <div className="flex flex-wrap justify-center items-center gap-10 mb-6">
-              <div className="flex flex-col items-center gap-3"><div className="bg-white p-1 rounded-xl"><img src="/logos/Logomp.jfif" alt="Mercado Pago" className="h-14 rounded-lg object-cover" /></div><span className="text-xs uppercase text-slate-200 font-bold font-sans">Mercado Pago</span></div>
-              <div className="flex flex-col items-center gap-3"><div className="h-14 w-14 bg-slate-900/80 rounded-xl flex items-center justify-center border border-sky-500/40 text-sky-400"><svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m4 6H4m0 0l4 4m-4-4l4-4"/></svg></div><span className="text-xs uppercase text-slate-200 font-bold font-sans">Transferencias</span></div>
-              <div className="flex flex-col items-center gap-3"><div className="h-14 w-14 bg-slate-900/80 rounded-xl flex items-center justify-center border border-sky-500/40 text-sky-400"><svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V11.75M3.75 5.25h16.5m-16.5 0a2.25 2.25 0 00-2.25 2.25v10.5a2.25 2.25 0 002.25 2.25m16.5-15a2.25 2.25 0 012.25 2.25v10.5a2.25 2.25 0 01-2.25 2.25m-12-7.5h.008v.008H8.25v-.008z"/></svg></div><span className="text-xs uppercase text-slate-200 font-bold font-sans">Efectivo</span></div>
-            </div>
-          </div>
-        </section>
-
-        {/* SECCIÓN PREGUNTAS FRECUENTES (Asistente Rápido) */}
-        <section className="min-h-[60svh] flex flex-col items-center justify-center p-6 w-full">
-          <div className="max-w-2xl w-full bg-slate-900/60 backdrop-blur-xl rounded-3xl p-6 md:p-8 border border-sky-500/40 shadow-2xl">
-            <h2 className="text-2xl font-bold text-sky-400 uppercase mb-6 text-center tracking-wide flex items-center justify-center gap-2">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-              Ayuda Rápida
-            </h2>
-            <div className="space-y-3 font-sans">
-              {PREGUNTAS_FRECUENTES.map((faq, idx) => (
-                <div key={idx} className="border border-slate-700/50 rounded-lg bg-slate-950/50 overflow-hidden transition-all duration-300">
-                  <button 
-                    onClick={() => toggleFaq(idx)}
-                    className="w-full px-5 py-4 text-left flex justify-between items-center text-sm md:text-base font-bold text-slate-200 hover:text-sky-300 transition-colors focus:outline-none"
-                  >
-                    {faq.q}
-                    <span className="text-sky-500 text-xl font-light">{openFaq === idx ? '−' : '+'}</span>
-                  </button>
-                  <div className={`px-5 text-sm text-slate-400 overflow-hidden transition-all duration-300 ease-in-out ${openFaq === idx ? 'max-h-40 pb-4 opacity-100' : 'max-h-0 opacity-0'}`}>
-                    {faq.a}
-                  </div>
+              
+              <div className="flex flex-col items-center gap-3">
+                <div className="bg-white p-1 rounded-xl">
+                  <img src="/logos/Logomp.jfif" alt="Mercado Pago" className="h-14 rounded-lg object-cover" />
                 </div>
-              ))}
+                <span className="text-xs uppercase text-slate-200 font-bold font-sans">Mercado Pago</span>
+              </div>
+              
+              <div className="flex flex-col items-center gap-3">
+                <div className="h-14 w-14 bg-slate-900/80 rounded-xl flex items-center justify-center border border-sky-500/40 text-sky-400">
+                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m4 6H4m0 0l4 4m-4-4l4-4"/></svg>
+                </div>
+                <span className="text-xs uppercase text-slate-200 font-bold font-sans">Transferencias</span>
+              </div>
+              
+              <div className="flex flex-col items-center gap-3">
+                <div className="h-14 w-14 bg-slate-900/80 rounded-xl flex items-center justify-center border border-sky-500/40 text-sky-400">
+                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V11.75M3.75 5.25h16.5m-16.5 0a2.25 2.25 0 00-2.25 2.25v10.5a2.25 2.25 0 002.25 2.25m16.5-15a2.25 2.25 0 012.25 2.25v10.5a2.25 2.25 0 01-2.25 2.25m-12-7.5h.008v.008H8.25v-.008z"/></svg>
+                </div>
+                <span className="text-xs uppercase text-slate-200 font-bold font-sans">Efectivo</span>
+              </div>
+
             </div>
           </div>
         </section>
 
-        {/* PLACA COMUNICADO */}
+        {/* PANTALLA 5: PLACA COMUNICADO */}
         <section className="min-h-[100svh] flex flex-col items-center justify-center p-6 text-center space-y-6">
           <div className="bg-slate-950/40 backdrop-blur-sm p-3 rounded-xl border border-white/10 mb-2 shadow-lg">
             <h2 className="text-3xl md:text-4xl font-bold text-sky-400 uppercase drop-shadow-[0_4px_10px_rgba(0,0,0,0.9)] tracking-wider">Comunicado Oficial</h2>
@@ -361,7 +362,7 @@ export default function ViajeFilialPage() {
           </div>
         </section>
 
-        {/* FORMULARIO FINAL */}
+        {/* PANTALLA 6: FORMULARIO FINAL */}
         <section className="min-h-[100svh] flex flex-col items-center justify-center p-4 pb-20">
           <div className="max-w-md w-full bg-slate-900/60 backdrop-blur-xl rounded-2xl p-6 md:p-8 shadow-[0_0_30px_rgba(0,0,0,0.8)] border border-sky-500/40">
             <div className="text-center mb-6 flex flex-col items-center">
@@ -409,19 +410,44 @@ export default function ViajeFilialPage() {
           </div>
         </section>
 
-        {/* FOOTER */}
+        {/* FOOTER: TOTALMENTE RECUPERADO CON DATOS EDITORIAL */}
         <footer className="w-full bg-slate-950/90 backdrop-blur-md border-t-4 border-slate-900 p-8 text-center text-xs font-sans relative z-10 shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
           <div className="max-w-xl mx-auto flex flex-col items-center gap-5">
+            
             <div className="flex flex-col items-center gap-4">
               <div className="bg-transparent overflow-hidden rounded-full shadow-[0_0_25px_rgba(56,189,248,0.3)] border-4 border-sky-600/50 h-24 w-24 md:h-32 md:w-32 flex items-center justify-center transition-transform hover:scale-105 duration-300">
                 <img src="/logos/Logo3.png" alt="Soberanía Editorial" className="h-full w-full object-cover drop-shadow-md" />
               </div>
+              
               <div className="flex flex-col items-center gap-1">
-                <span className={`font-bold text-white tracking-[0.25em] text-lg md:text-xl uppercase drop-shadow-md ${oswald.className}`}>Soberanía Editorial</span>
-                <span className="text-[10px] md:text-xs uppercase tracking-widest text-sky-400 font-bold bg-sky-950/60 px-4 py-1.5 rounded-full border border-sky-800/50">Desarrollo Web & Servicios Digitales</span>
+                <span className={`font-bold text-white tracking-[0.25em] text-lg md:text-xl uppercase drop-shadow-md ${oswald.className}`}>
+                  Soberanía Editorial
+                </span>
+                <span className="text-[10px] md:text-xs uppercase tracking-widest text-sky-400 font-bold bg-sky-950/60 px-4 py-1.5 rounded-full border border-sky-800/50">
+                  Desarrollo Web & Servicios Digitales
+                </span>
               </div>
             </div>
-            <p className="text-xs md:text-sm text-slate-300 mt-2 max-w-sm leading-relaxed font-medium drop-shadow">Desarrollamos soluciones digitales, plataformas y sistemas a medida.</p>
+
+            <p className="text-xs md:text-sm text-slate-300 mt-2 max-w-sm leading-relaxed font-medium drop-shadow">
+              Desarrollamos soluciones digitales, plataformas y sistemas de gestión a medida.
+            </p>
+
+            {/* Aca están de vuelta todos tus links y contactos intactos */}
+            <div className="flex flex-wrap justify-center gap-x-6 gap-y-3 text-slate-200 font-semibold text-xs mt-3">
+              <span className="flex items-center gap-2">
+                <svg className="w-4 h-4 text-sky-400" fill="currentColor" viewBox="0 0 24 24"><path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"/></svg>
+                Soberanía Digital
+              </span>
+              <span className="flex items-center gap-2">
+                <svg className="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                edicionesdemiantestino@gmail.com
+              </span>
+              <span className="flex items-center gap-2">
+                <svg className="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                2804841846
+              </span>
+            </div>
           </div>
         </footer>
 
