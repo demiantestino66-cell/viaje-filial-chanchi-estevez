@@ -393,7 +393,6 @@ export default function ViajeFilialPage() {
               </div>
             </div>
 
-            {/* SECCIÓN ACTUALIZADA DE CUOTAS Y FECHAS */}
             <div className="bg-sky-950/60 p-6 rounded-xl border border-sky-500/40 inline-block backdrop-blur-sm shadow-lg max-w-md w-full">
               <p className="text-2xl md:text-3xl text-sky-400 font-black uppercase mb-4 drop-shadow-md">Hasta 2 cuotas</p>
               
@@ -415,20 +414,32 @@ export default function ViajeFilialPage() {
           </div>
         </section>
 
-        {/* PANTALLA 5: PLACA COMUNICADO RACING PASS */}
+        {/* PANTALLA 5: COMUNICADOS OFICIALES ACTUALIZADOS */}
         <section className="min-h-[100svh] flex flex-col items-center justify-center p-6 text-center space-y-6">
           <div className="bg-slate-950/40 backdrop-blur-sm p-3 rounded-xl border border-white/10 mb-2 shadow-lg">
             <h2 className="text-3xl md:text-4xl font-bold text-sky-400 uppercase drop-shadow-[0_4px_10px_rgba(0,0,0,0.9)] tracking-wider">
-              Comunicado Oficial
+              Comunicados Oficiales
             </h2>
           </div>
           
-          <div className="max-w-md w-full bg-slate-900/50 backdrop-blur-xl p-4 rounded-3xl border-2 border-sky-500/40 shadow-[0_0_30px_rgba(0,0,0,0.8)] transition-transform hover:scale-[1.02] duration-300">
-            <img 
-              src="/galeria/Foto6.png" 
-              alt="Comunicado Filial Trelew Racing Pass" 
-              className="w-full h-auto rounded-2xl object-cover shadow-lg border border-sky-500/20" 
-            />
+          <div className="max-w-md w-full space-y-6">
+            {/* Comunicado 1 (Racing Pass) */}
+            <div className="bg-slate-900/50 backdrop-blur-xl p-4 rounded-3xl border-2 border-sky-500/40 shadow-[0_0_30px_rgba(0,0,0,0.8)] transition-transform hover:scale-[1.02] duration-300">
+              <img 
+                src="/galeria/Foto6.png" 
+                alt="Comunicado Filial Trelew Racing Pass" 
+                className="w-full h-auto rounded-2xl object-cover shadow-lg border border-sky-500/20" 
+              />
+            </div>
+
+            {/* Comunicado 2 (Valores de Socios - Foto7.jpg) */}
+            <div className="bg-slate-900/50 backdrop-blur-xl p-4 rounded-3xl border-2 border-sky-500/40 shadow-[0_0_30px_rgba(0,0,0,0.8)] transition-transform hover:scale-[1.02] duration-300">
+              <img 
+                src="/galeria/Foto7.jpg" 
+                alt="Valores Vigentes para Asociarse a Racing Club" 
+                className="w-full h-auto rounded-2xl object-cover shadow-lg border border-sky-500/20" 
+              />
+            </div>
           </div>
         </section>
 
@@ -437,10 +448,9 @@ export default function ViajeFilialPage() {
           <div className="max-w-md w-full bg-slate-900/55 backdrop-blur-xl rounded-2xl p-6 md:p-8 shadow-[0_0_30px_rgba(0,0,0,0.8)] border border-sky-500/40">
             
             <div className="text-center mb-6 flex flex-col items-center">
-              {/* CÓDIGO NUEVO Y CORREGIDO */}
-<div className="overflow-hidden rounded-full h-24 w-24 md:h-28 md:w-28 shadow-[0_0_20px_rgba(56,189,248,0.6)] mb-4 inline-block border-2 border-sky-400 bg-white">
-  <img src="/logos/Logo1.png" alt="Logo Filial Oficial" className="h-full w-full object-cover scale-110" />
-</div>
+              <div className="overflow-hidden rounded-full h-24 w-24 md:h-28 md:w-28 shadow-[0_0_20px_rgba(56,189,248,0.6)] mb-4 inline-block border-2 border-sky-400 bg-white">
+                <img src="/logos/Logo1.png" alt="Logo Filial Oficial" className="h-full w-full object-cover scale-110" />
+              </div>
               <h2 className="text-2xl font-black text-sky-400 uppercase tracking-wide drop-shadow-md">
                 Reservá tu Pasaje
               </h2>
