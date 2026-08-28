@@ -4,7 +4,7 @@
   "description": "App oficial de la Filial Racing Club Trelew para viajes y gestión de socios.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#020617",
+  "background_color": "#FFFFFF",
   "theme_color": "#0284c7",
   "icons": [
     {
