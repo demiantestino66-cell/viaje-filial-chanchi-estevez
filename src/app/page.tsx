@@ -393,10 +393,25 @@ export default function ViajeFilialPage() {
               </div>
             </div>
 
-            <div className="bg-sky-950/60 p-4 rounded-xl border border-sky-500/40 inline-block backdrop-blur-sm">
-              <p className="text-2xl md:text-3xl text-sky-400 font-black uppercase mb-1 drop-shadow-md">Hasta 2 cuotas</p>
-              <p className="text-slate-200 text-sm font-sans font-medium">Comunicate y resolvemos cualquier consulta sobre los pagos.</p>
+            {/* SECCIÓN ACTUALIZADA DE CUOTAS Y FECHAS */}
+            <div className="bg-sky-950/60 p-6 rounded-xl border border-sky-500/40 inline-block backdrop-blur-sm shadow-lg max-w-md w-full">
+              <p className="text-2xl md:text-3xl text-sky-400 font-black uppercase mb-4 drop-shadow-md">Hasta 2 cuotas</p>
+              
+              <div className="flex flex-col gap-3 mb-5 text-left bg-slate-900/50 p-4 rounded-xl border border-sky-500/20 shadow-inner">
+                <div className="flex items-center gap-3">
+                  <svg className="w-6 h-6 text-sky-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                  <p className="text-slate-200 text-sm font-sans font-bold tracking-wide">1ra Cuota: Hasta el 15 de Septiembre</p>
+                </div>
+                <div className="h-px w-full bg-sky-500/20"></div>
+                <div className="flex items-center gap-3">
+                  <svg className="w-6 h-6 text-sky-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                  <p className="text-slate-200 text-sm font-sans font-bold tracking-wide">2da Cuota: Hasta el 14 de Octubre</p>
+                </div>
+              </div>
+              
+              <p className="text-slate-300 text-xs font-sans font-medium uppercase tracking-widest">Comunicate y resolvemos cualquier consulta sobre los pagos.</p>
             </div>
+            
           </div>
         </section>
 
