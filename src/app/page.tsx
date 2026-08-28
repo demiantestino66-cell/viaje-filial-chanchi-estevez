@@ -437,9 +437,10 @@ export default function ViajeFilialPage() {
           <div className="max-w-md w-full bg-slate-900/55 backdrop-blur-xl rounded-2xl p-6 md:p-8 shadow-[0_0_30px_rgba(0,0,0,0.8)] border border-sky-500/40">
             
             <div className="text-center mb-6 flex flex-col items-center">
-              <div className="bg-white rounded-full p-2 shadow-[0_0_20px_rgba(56,189,248,0.6)] mb-4 inline-block border-2 border-sky-400">
-                <img src="/logos/Logo1.png" alt="Logo Filial Oficial" className="h-20 w-20 md:h-24 md:w-24 object-contain" />
-              </div>
+              {/* CÓDIGO NUEVO Y CORREGIDO */}
+<div className="overflow-hidden rounded-full h-24 w-24 md:h-28 md:w-28 shadow-[0_0_20px_rgba(56,189,248,0.6)] mb-4 inline-block border-2 border-sky-400 bg-white">
+  <img src="/logos/Logo1.png" alt="Logo Filial Oficial" className="h-full w-full object-cover scale-110" />
+</div>
               <h2 className="text-2xl font-black text-sky-400 uppercase tracking-wide drop-shadow-md">
                 Reservá tu Pasaje
               </h2>
