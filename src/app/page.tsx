@@ -198,9 +198,9 @@ export default function ViajeFilialPage() {
               Partidos en YouTube (En Vivo)
             </a>
 
-            <a href="https://radios-argentina.ar/" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 text-slate-200 hover:text-sky-400 transition-colors w-full py-3 bg-slate-800/30 rounded-lg">
+            <a href="https://www.lared.am/racing-a115934" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 text-slate-200 hover:text-sky-400 transition-colors w-full py-3 bg-slate-800/30 rounded-lg">
               <span className="text-base">📻</span>
-              Radios Deportivas AM/FM
+              Radio La Red (AM 910)
             </a>
             
             <div className="w-3/4 h-px bg-slate-700/50 my-2"></div>
