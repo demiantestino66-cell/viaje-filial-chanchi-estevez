@@ -366,7 +366,39 @@ export default function ViajeFilialPage() {
             </p>
           </div>
         </section>
+{/* PANTALLA / SECCIÓN: RADIO EN VIVO */}
+        <section className="min-h-[60svh] flex flex-col items-center justify-center p-6 text-center">
+          <div className="bg-slate-900/50 backdrop-blur-md p-8 md:p-12 rounded-3xl border-2 border-sky-500/30 w-full max-w-3xl shadow-2xl">
+            <h2 className="text-3xl md:text-4xl font-bold text-white uppercase mb-4">Radio & Transmisión en Vivo</h2>
+            <p className="text-slate-200 text-sm md:text-base font-sans mb-8">
+              Escuchá los partidos y seguí las transmisiones oficiales y partidarias durante el viaje.
+            </p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 font-sans">
+              <a 
+                href="https://racingonline.com.ar/" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="bg-sky-500/20 border border-sky-500/50 hover:bg-sky-500/40 p-6 rounded-2xl flex flex-col items-center justify-center gap-3 transition-all group shadow-lg"
+              >
+                <span className="text-3xl">📻</span>
+                <span className="font-bold text-white uppercase tracking-wider text-lg group-hover:text-sky-300">Racing Online</span>
+                <span className="text-xs text-sky-200">Transmisión partidaria oficial</span>
+              </a>
 
+              <a 
+                href="https://www.lared.am/racing-a115934" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="bg-slate-800/60 border border-slate-600/50 hover:bg-slate-800 p-6 rounded-2xl flex flex-col items-center justify-center gap-3 transition-all group shadow-lg"
+              >
+                <span className="text-3xl">🎙️</span>
+                <span className="font-bold text-white uppercase tracking-wider text-lg group-hover:text-sky-300">Radio La Red (AM 910)</span>
+                <span className="text-xs text-slate-300">Relatos en directo de AFA</span>
+              </a>
+            </div>
+          </div>
+        </section>
         {/* PANTALLA 4: MÉTODOS DE PAGO */}
         <section className="min-h-[70svh] flex flex-col items-center justify-center p-6 text-center">
           <div className="bg-slate-900/50 backdrop-blur-md p-10 rounded-3xl border-2 border-sky-500/30 w-full max-w-3xl shadow-2xl">
