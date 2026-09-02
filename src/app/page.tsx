@@ -165,9 +165,15 @@ export default function ViajeFilialPage() {
         </div>
 
         {/* MENÚ DESPLEGABLE */}
-        <div className={`absolute top-16 left-0 w-full bg-slate-900/95 backdrop-blur-xl border-b border-sky-500/30 transition-all duration-300 overflow-hidden ${isMenuOpen ? 'max-h-96 py-6' : 'max-h-0 py-0'} shadow-2xl`}>
+        <div className={`absolute top-16 left-0 w-full bg-slate-900/95 backdrop-blur-xl border-b border-sky-500/30 transition-all duration-300 overflow-hidden ${isMenuOpen ? 'max-h-[420px] py-6' : 'max-h-0 py-0'} shadow-2xl`}>
           <nav className="flex flex-col items-center gap-2 text-sm uppercase tracking-widest font-sans font-bold px-4">
             
+            {/* ENLACE A LA WEB PRINCIPAL DE LA FILIAL */}
+            <a href="https://racing-filial-trelew-chanchi.vercel.app" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 text-sky-400 hover:text-sky-300 transition-colors w-full py-3 bg-sky-500/10 border border-sky-500/40 rounded-lg">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+              Web Oficial Filial Trelew
+            </a>
+
             <a href="https://www.racingclub.com.ar/" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 text-slate-200 hover:text-sky-400 transition-colors w-full py-3 bg-slate-800/30 rounded-lg">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
               Sitio Oficial Racing
@@ -561,6 +567,19 @@ export default function ViajeFilialPage() {
         <footer className="w-full bg-slate-950/90 backdrop-blur-md border-t-4 border-slate-900 p-8 text-center text-xs font-sans relative z-10 shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
           <div className="max-w-xl mx-auto flex flex-col items-center gap-5">
             
+            {/* BOTÓN WEB PRINCIPAL DE LA FILIAL */}
+            <div className="w-full mb-2">
+              <a 
+                href="https://racing-filial-trelew-chanchi.vercel.app" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="inline-flex items-center justify-center gap-2 bg-sky-500/20 border border-sky-500/50 text-sky-400 hover:bg-sky-500/30 px-6 py-3 rounded-xl text-xs uppercase tracking-widest font-bold transition-all shadow-lg w-full max-w-sm mx-auto"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                🌐 Visitar la Web Principal de la Filial
+              </a>
+            </div>
+
             <div className="flex flex-col items-center gap-4">
               <div className="bg-transparent overflow-hidden rounded-full shadow-[0_0_25px_rgba(56,189,248,0.3)] border-4 border-sky-600/50 h-24 w-24 md:h-32 md:w-32 flex items-center justify-center transition-transform hover:scale-105 duration-300">
                 <img src="/logos/Logo3.png" alt="Soberanía Editorial" className="h-full w-full object-cover drop-shadow-md" />
