@@ -6,7 +6,7 @@ import { Oswald } from 'next/font/google';
 const oswald = Oswald({ subsets: ['latin'], weight: ['400', '700'] });
 
 // Imagen de fondo fija para evitar parpadeos y re-renders continuos
-const IMAGEN_FONDO = '/galeria/Foto1.jpg';
+const IMAGEN_FONDO = '/galeria/Foto1.webp';
 
 const AUDIOS = [
   '/audio/Audio.mp3',
