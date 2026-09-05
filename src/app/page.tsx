@@ -5,13 +5,8 @@ import { Oswald } from 'next/font/google';
 
 const oswald = Oswald({ subsets: ['latin'], weight: ['400', '700'] });
 
-const IMAGENES = [
-  '/galeria/Foto1.jpg',
-  '/galeria/Foto2.jpg',
-  '/galeria/Foto3.jpg',
-  '/galeria/Foto4.jpg',
-  '/galeria/Foto5.jpg',
-];
+// Imagen de fondo fija para evitar parpadeos y re-renders continuos
+const IMAGEN_FONDO = '/galeria/Foto1.jpg';
 
 const AUDIOS = [
   '/audio/Audio.mp3',
@@ -24,7 +19,6 @@ const FECHA_SALIDA = new Date('2026-10-17T12:00:00');
 const FECHA_PARTIDO = new Date('2026-10-18T17:30:00');
 
 export default function ViajeFilialPage() {
-  const [currentImg, setCurrentImg] = useState(0);
   const [currentAudioIndex, setCurrentAudioIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -65,14 +59,6 @@ export default function ViajeFilialPage() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, []);
-
-  // Rotación de imágenes de fondo
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentImg((prev) => (prev + 1) % IMAGENES.length);
-    }, 4500);
-    return () => clearInterval(interval);
   }, []);
 
   // Control estricto del reproductor cíclico
@@ -216,7 +202,7 @@ export default function ViajeFilialPage() {
         </div>
       </header>
 
-      {/* MODAL EN CONSTRUCCIÓN (Z-Index alto para tapar todo) */}
+      {/* MODAL EN CONSTRUCCIÓN */}
       {showModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md" onClick={() => setShowModal(false)}>
           <div className="bg-slate-900 border border-sky-500/50 p-8 rounded-2xl max-w-sm w-full text-center shadow-[0_0_40px_rgba(56,189,248,0.3)] animate-pulse" onClick={e => e.stopPropagation()}>
@@ -235,17 +221,12 @@ export default function ViajeFilialPage() {
         </div>
       )}
 
-      {/* Slider de Fondo */}
+      {/* Fondo Fijo Estático sin intervalos ni re-renders */}
       <div className="fixed inset-0 z-0 pointer-events-none bg-slate-950">
-        {IMAGENES.map((img, index) => (
-          <div
-            key={img}
-            className={`absolute inset-0 bg-cover bg-center transition-opacity duration-1000 ease-in-out ${
-              index === currentImg ? 'opacity-[0.80] scale-105' : 'opacity-0 scale-100'
-            } transition-transform duration-[6000ms]`}
-            style={{ backgroundImage: `url(${img})` }}
-          />
-        ))}
+        <div 
+          className="absolute inset-0 bg-cover bg-center opacity-[0.80]"
+          style={{ backgroundImage: `url(${IMAGEN_FONDO})` }}
+        />
         <div className="absolute inset-0 bg-gradient-to-b from-slate-950/40 via-slate-950/30 to-slate-950/50" />
       </div>
 
@@ -434,7 +415,7 @@ export default function ViajeFilialPage() {
           </div>
         </section>
 
-        {/* PANTALLA 5: COMUNICADOS OFICIALES ACTUALIZADOS */}
+        {/* PANTALLA 5: COMUNICADOS OFICIALES */}
         <section className="min-h-[100svh] flex flex-col items-center justify-center p-6 text-center space-y-6">
           <div className="bg-slate-950/40 backdrop-blur-sm p-3 rounded-xl border border-white/10 mb-2 shadow-lg">
             <h2 className="text-3xl md:text-4xl font-bold text-sky-400 uppercase drop-shadow-[0_4px_10px_rgba(0,0,0,0.9)] tracking-wider">
