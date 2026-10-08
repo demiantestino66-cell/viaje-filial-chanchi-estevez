@@ -363,11 +363,11 @@ export default function ViajeFilialPage() {
         </section>
 
         {/* PANTALLA 4: MÉTODOS DE PAGO */}
-        <section className="min-h-[70svh] flex flex-col items-center justify-center p-6 text-center">
-          <div className="bg-slate-900/50 backdrop-blur-md p-10 rounded-3xl border-2 border-sky-500/30 w-full max-w-3xl shadow-2xl">
-            <h2 className="text-3xl font-bold text-white uppercase mb-10">Métodos de Pago</h2>
+        <section className="min-h-[50svh] flex flex-col items-center justify-center p-6 text-center">
+          <div className="bg-slate-900/50 backdrop-blur-md p-8 md:p-10 rounded-3xl border-2 border-sky-500/30 w-full max-w-3xl shadow-2xl">
+            <h2 className="text-3xl font-bold text-white uppercase mb-8">Métodos de Pago</h2>
             
-            <div className="flex flex-wrap justify-center items-center gap-10 mb-10">
+            <div className="flex flex-wrap justify-center items-center gap-10">
               <div className="flex flex-col items-center gap-3">
                 <div className="bg-white p-1 rounded-xl shadow-[0_0_15px_rgba(56,189,248,0.3)]">
                   <img src="/logos/Logomp.jfif" alt="Mercado Pago" className="h-14 md:h-16 rounded-lg object-cover" />
@@ -393,25 +393,6 @@ export default function ViajeFilialPage() {
                 <span className="text-xs uppercase text-slate-200 font-bold tracking-widest font-sans">Efectivo</span>
               </div>
             </div>
-
-            <div className="bg-sky-950/60 p-6 rounded-xl border border-sky-500/40 inline-block backdrop-blur-sm shadow-lg max-w-md w-full">
-              <p className="text-2xl md:text-3xl text-sky-400 font-black uppercase mb-4 drop-shadow-md">Hasta 2 cuotas</p>
-              
-              <div className="flex flex-col gap-3 mb-5 text-left bg-slate-900/50 p-4 rounded-xl border border-sky-500/20 shadow-inner">
-                <div className="flex items-center gap-3">
-                  <svg className="w-6 h-6 text-sky-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                  <p className="text-slate-200 text-sm font-sans font-bold tracking-wide">1ra Cuota: Hasta el 15 de Septiembre</p>
-                </div>
-                <div className="h-px w-full bg-sky-500/20"></div>
-                <div className="flex items-center gap-3">
-                  <svg className="w-6 h-6 text-sky-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                  <p className="text-slate-200 text-sm font-sans font-bold tracking-wide">2da Cuota: Hasta el 14 de Octubre</p>
-                </div>
-              </div>
-              
-              <p className="text-slate-300 text-xs font-sans font-medium uppercase tracking-widest">Comunicate y resolvemos cualquier consulta sobre los pagos.</p>
-            </div>
-            
           </div>
         </section>
 
@@ -531,7 +512,6 @@ export default function ViajeFilialPage() {
                 >
                   <option value="Efectivo" className="bg-slate-900">Efectivo</option>
                   <option value="Transferencia" className="bg-slate-900">Transferencia</option>
-                  <option value="En 2 Cuotas" className="bg-slate-900">En 2 Cuotas</option>
                 </select>
               </div>
 
