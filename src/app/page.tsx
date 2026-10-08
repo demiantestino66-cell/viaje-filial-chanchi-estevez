@@ -16,7 +16,7 @@ const AUDIOS = [
 ];
 
 const FECHA_SALIDA = new Date('2026-10-17T12:00:00');
-const FECHA_PARTIDO = new Date('2026-10-18T17:30:00');
+const FECHA_PARTIDO = new Date('2026-10-18T14:45:00');
 
 export default function ViajeFilialPage() {
   const [currentAudioIndex, setCurrentAudioIndex] = useState(0);
@@ -268,7 +268,7 @@ export default function ViajeFilialPage() {
                   <span>:</span>
                   <div className="flex flex-col items-center"><span className="text-4xl text-white">{timeLeftPartido.m}</span><span className="text-xs font-normal">Min</span></div>
                 </div>
-                <p className="text-xs text-slate-100 mt-2 font-sans font-medium drop-shadow">18 de Octubre, 17:30 HS (A confirmar)</p>
+                <p className="text-xs text-slate-100 mt-2 font-sans font-medium drop-shadow">18 de Octubre, 14:45 HS</p>
               </div>
             </div>
           </div>
