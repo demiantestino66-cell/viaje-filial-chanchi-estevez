@@ -1,36 +1,34 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Filial Racing Club Trelew
 
-## Getting Started
+Sitio oficial de la Filial Trelew “Chanchi Estévez”, con actualidad de Racing Club, fixture, comunicados, consultas por WhatsApp y gestión de socios.
 
-First, run the development server:
+## Desarrollo local
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Requisitos: Node.js y npm.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+1. Instalá las dependencias con `npm install`.
+2. Configurá `.env.local` con las variables de Supabase:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+   ```text
+   NEXT_PUBLIC_SUPABASE_URL=
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=
+   ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+3. Iniciá el servidor con `npm run dev` y abrí `http://localhost:3000`.
 
-## Learn More
+Antes de publicar, validá la compilación con `npm run build`.
 
-To learn more about Next.js, take a look at the following resources:
+## Actualización de contenido
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Actualizá las tarjetas semanales de actualidad en `src/app/page.tsx`, en el arreglo `NOTICIAS`.
+- El fixture muestra “Programación a confirmar” hasta que Racing Club publique información oficial; no se deben completar fechas sin confirmar.
+- El formulario de consultas abre WhatsApp al número de contacto configurado en `WHATSAPP_FILIAL`, en `src/app/page.tsx`.
+- Los datos de acceso a Supabase se administran mediante variables de entorno; no guardes claves en el código fuente.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Gestión de socios
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- El portal consulta por DNI y recupera solo los datos necesarios para validar la solicitud y mostrar la credencial.
+- El panel `/admin` usa una proyección explícita de columnas para reducir el tamaño de la respuesta; el filtro de padrón se aplica localmente sin nuevas consultas.
+- La exportación genera CSV compatible con Excel (BOM UTF-8 y separador `;`), con valores escapados para conservar tildes y comillas.
+- La impresión de la credencial usa el diálogo nativo del navegador y una hoja A4 con frente y dorso; en el navegador se puede elegir “Guardar como PDF”.
+- Para padrones grandes, conviene indexar `socios.dni` y `socios.created_at` y evaluar paginación del padrón y una exportación por lotes. La disponibilidad de esos índices depende del esquema de Supabase desplegado.

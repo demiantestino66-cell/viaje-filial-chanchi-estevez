@@ -2,18 +2,33 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { Oswald } from 'next/font/google';
 import CarnetSocio from '@/components/CarnetSocio';
+import SocioSkeleton from '@/components/SocioSkeleton';
 
 const oswald = Oswald({ subsets: ['latin'], weight: ['400', '700'] });
+const WHATSAPP_FILIAL = '5492804588309';
+
+type SocioPortal = {
+  nombre: string;
+  apellido: string;
+  dni: string;
+  estado: string;
+  cuota_al_dia?: string | null;
+  fecha_deuda?: string | null;
+  foto_url?: string | null;
+  socio_racing?: string | null;
+  numero_socio_filial?: string | null;
+};
 
 export default function LoginPage() {
   const [modo, setModo] = useState<'socio' | 'admin'>('socio');
 
   // Estados para Socio (Búsqueda por DNI)
   const [dniConsulta, setDniConsulta] = useState('');
-  const [socioEncontrado, setSocioEncontrado] = useState<any>(null);
+  const [socioEncontrado, setSocioEncontrado] = useState<SocioPortal | null>(null);
   const [buscandoSocio, setBuscandoSocio] = useState(false);
   const [errorSocio, setErrorSocio] = useState<string | null>(null);
 
@@ -34,18 +49,26 @@ export default function LoginPage() {
     try {
       const { data, error } = await supabase
         .from('socios')
-        .select('*')
+        .select(
+          'nombre,apellido,dni,estado,cuota_al_dia,fecha_deuda,foto_url,socio_racing,numero_socio_filial',
+        )
         .eq('dni', dniConsulta.trim())
-        .single();
+        .maybeSingle();
 
-      if (error || !data) {
+      if (error) {
+        setErrorSocio(
+          error.code === 'PGRST116'
+            ? 'No se encontró ningún socio registrado con ese DNI.'
+            : 'No se pudo completar la consulta. Intentá nuevamente más tarde.',
+        );
+      } else if (!data) {
         setErrorSocio('No se encontró ningún socio registrado con ese DNI.');
       } else if (data.estado !== 'aprobado') {
-        setErrorSocio(`Tu solicitud se encuentra en estado: "${data.estado}". Aún no está aprobada por la comisión.`);
+        setErrorSocio(`Tu solicitud se encuentra en estado: “${data.estado}”. Aún no está aprobada por la comisión.`);
       } else {
         setSocioEncontrado(data);
       }
-    } catch (err) {
+    } catch {
       setErrorSocio('Ocurrió un error al buscar el DNI. Intentá nuevamente.');
     } finally {
       setBuscandoSocio(false);
@@ -71,7 +94,7 @@ export default function LoginPage() {
 
     if (data?.session) {
       router.refresh();
-      window.location.href = '/admin';
+      router.push('/admin');
     }
   };
 
@@ -90,7 +113,7 @@ export default function LoginPage() {
             Portal Filial Trelew
           </h1>
           <p className="text-slate-400 text-xs mt-1">
-            Racing Club "Chanchi Estévez"
+            Racing Club “Chanchi Estévez”
           </p>
         </div>
 
@@ -139,6 +162,8 @@ export default function LoginPage() {
                   </div>
                 )}
 
+                {buscandoSocio && <SocioSkeleton />}
+
                 <button
                   type="submit"
                   disabled={buscandoSocio}
@@ -154,20 +179,51 @@ export default function LoginPage() {
                   ¡Socio Validado Correctamente!
                 </div>
 
-                {/* Renderizamos el Carnet con los datos reales */}
+                {socioEncontrado.cuota_al_dia === 'si' ? (
+                  <div className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs p-3 rounded-xl font-bold">
+                    Cuota al día · Beneficios habilitados
+                  </div>
+                ) : (
+                  <div className="motion-safe:animate-pulse space-y-3 rounded-xl border border-orange-400/60 bg-gradient-to-br from-orange-950/70 to-red-950/50 p-4 text-left shadow-[0_0_24px_rgba(249,115,22,0.18)]">
+                    <h3 className="text-xs font-black uppercase text-orange-300">
+                      Beneficios temporalmente suspendidos
+                    </h3>
+                    <p className="text-[11px] leading-relaxed text-orange-100">
+                      {socioEncontrado.fecha_deuda
+                        ? `Registramos una cuota pendiente desde ${socioEncontrado.fecha_deuda}.`
+                        : 'Contactanos para regularizar o consultar el estado de tu cuota.'}
+                    </p>
+                    <a
+                      href={`https://wa.me/${WHATSAPP_FILIAL}?text=${encodeURIComponent(
+                        `Hola, soy ${socioEncontrado.nombre} ${socioEncontrado.apellido} (DNI: ${socioEncontrado.dni}). Quisiera regularizar mi cuota de la Filial Trelew.`,
+                      )}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block rounded-xl bg-orange-400 px-4 py-3 text-center text-xs font-black uppercase text-slate-950 transition hover:bg-orange-300"
+                    >
+                      Regularizar por WhatsApp
+                    </a>
+                  </div>
+                )}
+
                 <div className="flex justify-center scale-95 origin-top">
-                  <CarnetSocio socio={socioEncontrado} />
+                  <CarnetSocio
+                    socio={socioEncontrado}
+                    allowPrint={socioEncontrado.cuota_al_dia === 'si'}
+                    allowFlip={socioEncontrado.cuota_al_dia === 'si'}
+                  />
                 </div>
 
-                {/* BANNER DE BENEFICIOS PRÓXIMAMENTE */}
-                <div className="bg-sky-950/40 border border-sky-500/30 p-4 rounded-xl text-left space-y-1">
-                  <h3 className="text-xs font-bold uppercase text-sky-400 flex items-center gap-1.5">
-                    🎁 Beneficios para Socios
-                  </h3>
-                  <p className="text-[11px] text-slate-300 leading-relaxed">
-                    Próximamente habilitaremos descuentos, sorteos y beneficios exclusivos presentando este carnet para socios con cuota al día de la Filial Trelew.
-                  </p>
-                </div>
+                {socioEncontrado.cuota_al_dia === 'si' && (
+                  <div className="space-y-1 rounded-xl border border-sky-500/30 bg-sky-950/40 p-4 text-left">
+                    <h3 className="flex items-center gap-1.5 text-xs font-bold uppercase text-sky-400">
+                      🎁 Beneficios para Socios
+                    </h3>
+                    <p className="text-[11px] leading-relaxed text-slate-300">
+                      Próximamente habilitaremos descuentos, sorteos y beneficios exclusivos presentando este carnet para socios con cuota al día de la Filial Trelew.
+                    </p>
+                  </div>
+                )}
 
                 <button
                   onClick={() => setSocioEncontrado(null)}
@@ -228,9 +284,9 @@ export default function LoginPage() {
         )}
 
         <div className="mt-6 text-center border-t border-slate-800 pt-4">
-          <a href="/" className="text-xs text-slate-400 hover:text-sky-300 transition-colors">
+          <Link href="/" className="text-xs text-slate-400 hover:text-sky-300 transition-colors">
             ← Volver a la web principal
-          </a>
+          </Link>
         </div>
 
       </div>

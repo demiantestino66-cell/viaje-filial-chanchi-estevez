@@ -1,16 +1,30 @@
 'use client';
 
 import { useEffect, useState, use } from 'react';
-import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import CarnetSocio from '@/components/CarnetSocio';
 import Link from 'next/link';
 
+type SocioDetalle = {
+  id: string;
+  nombre?: string | null;
+  apellido?: string | null;
+  dni?: string | null;
+  telefono?: string | null;
+  localidad?: string | null;
+  socio_racing?: string | null;
+  numero_socio_filial?: string | null;
+  estado?: string | null;
+  cuota_al_dia?: string | null;
+  fecha_inscripcion?: string | null;
+  fecha_deuda?: string | null;
+  foto_url?: string | null;
+};
+
 export default function DetalleSocioAdmin({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const router = useRouter();
 
-  const [socio, setSocio] = useState<any>(null);
+  const [socio, setSocio] = useState<SocioDetalle | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [mensaje, setMensaje] = useState<{ tipo: 'exito' | 'error'; texto: string } | null>(null);
@@ -35,12 +49,14 @@ export default function DetalleSocioAdmin({ params }: { params: Promise<{ id: st
     const fetchSocio = async () => {
       const { data, error } = await supabase
         .from('socios')
-        .select('*')
+        .select(
+          'id,nombre,apellido,dni,telefono,localidad,socio_racing,numero_socio_filial,estado,cuota_al_dia,fecha_inscripcion,fecha_deuda,foto_url',
+        )
         .eq('id', id)
         .single();
 
       if (error) {
-        console.error('Error al cargar socio:', error);
+        setMensaje({ tipo: 'error', texto: `Error al cargar el socio: ${error.message}` });
       } else if (data) {
         setSocio(data);
         setCuotaAnterior(data.cuota_al_dia || 'si');
@@ -106,7 +122,7 @@ export default function DetalleSocioAdmin({ params }: { params: Promise<{ id: st
     } else {
       setMensaje({ tipo: 'exito', texto: '¡Datos, estado de cuota y fecha de deuda actualizados correctamente!' });
       setCuotaAnterior(formData.cuota_al_dia);
-      setSocio((prev: any) => ({ ...prev, ...datosParaEnviar }));
+      setSocio((prev) => (prev ? { ...prev, ...datosParaEnviar } : prev));
     }
     setSaving(false);
   };
@@ -122,7 +138,9 @@ export default function DetalleSocioAdmin({ params }: { params: Promise<{ id: st
   if (!socio) {
     return (
       <div className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center p-4">
-        <p className="text-red-400 font-bold mb-4">No se encontró la solicitud de este socio.</p>
+        <p className="mb-4 font-bold text-red-400">
+          {mensaje?.tipo === 'error' ? mensaje.texto : 'No se encontró la solicitud de este socio.'}
+        </p>
         <Link href="/admin" className="text-sky-400 underline text-sm">
           ← Volver al Panel
         </Link>

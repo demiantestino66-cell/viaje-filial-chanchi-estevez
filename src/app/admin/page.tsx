@@ -1,16 +1,37 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useDeferredValue, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
+
+type SocioAdmin = {
+  id: string;
+  nombre: string;
+  apellido: string;
+  dni: string;
+  telefono?: string | null;
+  localidad?: string | null;
+  socio_racing?: string | null;
+  numero_socio_filial?: string | null;
+  cuota_al_dia?: string | null;
+  fecha_deuda?: string | null;
+  fecha_inscripcion?: string | null;
+  estado?: string | null;
+  foto_url?: string | null;
+};
+
+const normalizarBusqueda = (value: string) =>
+  value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('es-AR');
 
 export default function AdminSociosPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [authenticated, setAuthenticated] = useState(false);
-  const [socios, setSocios] = useState<any[]>([]);
+  const [socios, setSocios] = useState<SocioAdmin[]>([]);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [filtroSocios, setFiltroSocios] = useState('');
+  const filtroDiferido = useDeferredValue(normalizarBusqueda(filtroSocios.trim()));
 
   // Estados para el Modal de Alta Manual
   const [modalAbierto, setModalAbierto] = useState(false);
@@ -33,35 +54,53 @@ export default function AdminSociosPage() {
     fecha_inscripcion: new Date().toISOString().split('T')[0],
   });
 
+  useEffect(() => () => {
+    if (previewFoto) URL.revokeObjectURL(previewFoto);
+  }, [previewFoto]);
+
   useEffect(() => {
     const checkAuthAndFetch = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error) throw error;
 
-      if (!session) {
-        router.push('/login');
-        return;
+        if (!session) {
+          router.push('/login');
+          return;
+        }
+
+        setAuthenticated(true);
+        await fetchSocios();
+      } catch (error) {
+        setErrorMsg(error instanceof Error ? error.message : 'No se pudo verificar el acceso.');
+        setLoading(false);
       }
-
-      setAuthenticated(true);
-      fetchSocios();
     };
 
     checkAuthAndFetch();
   }, [router]);
 
-  const fetchSocios = async () => {
-    const { data, error } = await supabase
-      .from('socios')
-      .select('*')
-      .order('created_at', { ascending: false });
+  async function fetchSocios() {
+    try {
+      const { data, error } = await supabase
+        .from('socios')
+        .select(
+          'id,nombre,apellido,dni,telefono,localidad,socio_racing,numero_socio_filial,cuota_al_dia,fecha_deuda,fecha_inscripcion,estado,foto_url,created_at',
+        )
+        .order('created_at', { ascending: false });
 
-    if (error) {
-      setErrorMsg(error.message);
-    } else if (data) {
-      setSocios(data);
+      if (error) {
+        setErrorMsg(error.message);
+      } else if (data) {
+        setSocios(data);
+        setErrorMsg(null);
+      }
+    } catch (error) {
+      setErrorMsg(error instanceof Error ? error.message : 'No se pudo cargar el padrón de socios.');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
-  };
+  }
 
   const handleFotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -71,17 +110,7 @@ export default function AdminSociosPage() {
     }
   };
 
-  // Función para convertir archivo a Base64
-  const convertBase64 = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const fileReader = new FileReader();
-      fileReader.readAsDataURL(file);
-      fileReader.onload = () => resolve(fileReader.result as string);
-      fileReader.onerror = (error) => reject(error);
-    });
-  };
-
-  // Función para exportar el listado completo a Excel de forma prolija (con separador punto y coma ';')
+  // Excel reconoce el BOM y el separador regional; se escapan comillas y separadores CSV.
   const exportarAExcel = () => {
     if (socios.length === 0) {
       alert('No hay socios para exportar.');
@@ -90,18 +119,22 @@ export default function AdminSociosPage() {
 
     const headers = ['Nombre', 'Apellido', 'DNI', 'N° Socio Filial', 'Estado Cuota', 'Fecha Inicio Deuda', 'Fecha Ingreso / Antigüedad', 'Estado Solicitud'];
     
-    const rows = socios.map(s => [
-      `"${s.nombre || ''}"`,
-      `"${s.apellido || ''}"`,
-      `"${s.dni || ''}"`,
-      `"${s.numero_socio_filial || 'Sin asignar'}"`,
-      `"${s.cuota_al_dia === 'si' ? 'Al Día' : 'En Deuda'}"`,
-      `"${s.fecha_deuda ? s.fecha_deuda.split('T')[0] : '-'}"`,
-      `"${s.fecha_inscripcion ? s.fecha_inscripcion.split('T')[0] : 'Sin fecha'}"`,
-      `"${s.estado || 'pendiente'}"`
-    ]);
+    const csvCell = (value: string) => {
+      const safeValue = /^[\t\r ]*[=+\-@]/.test(value) ? `'${value}` : value;
+      return `"${safeValue.replace(/"/g, '""')}"`;
+    };
+    const rows = socios.map((s) => [
+      s.nombre || '',
+      s.apellido || '',
+      s.dni || '',
+      s.numero_socio_filial || 'Sin asignar',
+      s.cuota_al_dia === 'si' ? 'Al Día' : 'En Deuda',
+      s.fecha_deuda ? s.fecha_deuda.split('T')[0] : '-',
+      s.fecha_inscripcion ? s.fecha_inscripcion.split('T')[0] : 'Sin fecha',
+      s.estado || 'pendiente',
+    ].map(csvCell).join(';'));
 
-    const csvContent = '\uFEFF' + [headers.join(';'), ...rows.map(e => e.join(';'))].join('\n');
+    const csvContent = '\uFEFF' + [headers.map(csvCell).join(';'), ...rows].join('\r\n');
     
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
@@ -114,6 +147,7 @@ export default function AdminSociosPage() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
 
   // Guardar Alta Manual de Socio desde el Panel
@@ -125,24 +159,21 @@ export default function AdminSociosPage() {
       let fotoUrl = '/logos/Logo1.png';
 
       if (archivoFoto) {
-        const fotoBase64 = await convertBase64(archivoFoto);
-        const fileBuffer = Buffer.from(fotoBase64.split(',')[1], 'base64');
         const fileExt = archivoFoto.type.split('/')[1] || 'jpg';
         const fileName = `${nuevoSocio.dni.trim()}-${Date.now()}.${fileExt}`;
 
         const { error: uploadError } = await supabase.storage
           .from('fotos-socios')
-          .upload(fileName, fileBuffer, {
+          .upload(fileName, archivoFoto, {
             contentType: archivoFoto.type,
             upsert: true,
           });
 
-        if (!uploadError) {
-          const { data: publicUrlData } = supabase.storage
-            .from('fotos-socios')
-            .getPublicUrl(fileName);
-          fotoUrl = publicUrlData.publicUrl;
-        }
+        if (uploadError) throw uploadError;
+        const { data: publicUrlData } = supabase.storage
+          .from('fotos-socios')
+          .getPublicUrl(fileName);
+        fotoUrl = publicUrlData.publicUrl;
       }
 
       const { error: dbError } = await supabase.from('socios').insert([
@@ -178,9 +209,10 @@ export default function AdminSociosPage() {
         cuota_al_dia: 'si',
         fecha_inscripcion: new Date().toISOString().split('T')[0],
       });
-      fetchSocios();
-    } catch (err: any) {
-      alert(`Error al registrar socio: ${err.message}`);
+      await fetchSocios();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Error desconocido';
+      alert(`Error al registrar socio: ${message}`);
     } finally {
       setGuardandoManual(false);
     }
@@ -194,13 +226,30 @@ export default function AdminSociosPage() {
     );
   }
 
-  if (!authenticated) return null;
+  if (!authenticated) {
+    if (!errorMsg) return null;
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-slate-950 p-4 text-center text-sm text-red-300">
+        No se pudo verificar el acceso: {errorMsg}
+      </div>
+    );
+  }
 
   // Filtrar socios para la sección de WhatsApp
   const sociosParaWp = socios.filter(s => {
     if (!s.telefono || s.telefono.trim() === '') return false;
     if (filtroWp === 'deuda') return s.cuota_al_dia === 'no';
     return true;
+  });
+  const sociosFiltrados = socios.filter((socio) => {
+    if (!filtroDiferido) return true;
+    const dniFiltro = filtroDiferido.replace(/\D/g, '');
+    const dniSocio = (socio.dni || '').replace(/\D/g, '');
+    const nombre = normalizarBusqueda(`${socio.nombre || ''} ${socio.apellido || ''}`);
+    return (
+      (dniFiltro.length > 0 && dniSocio.includes(dniFiltro)) ||
+      nombre.includes(filtroDiferido)
+    );
   });
 
   return (
@@ -220,7 +269,7 @@ export default function AdminSociosPage() {
               Panel de Administración
             </h1>
             <p className="text-sm text-slate-400 mt-1">
-              Gestión de Socios - Filial Trelew "Chanchi Estévez"
+            Gestión de Socios - Filial Trelew “Chanchi Estévez”
             </p>
           </div>
           
@@ -302,9 +351,11 @@ export default function AdminSociosPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[350px] overflow-y-auto pr-2">
               {sociosParaWp.map((socio) => {
                 const esDeudor = socio.cuota_al_dia === 'no';
+                const telefono = (socio.telefono ?? '').replace(/\D/g, '');
+                const nombreCompleto = `${socio.nombre} ${socio.apellido}`.trim();
                 const mensajeWp = esDeudor
-                  ? `¡Hola ${socio.nombre}! ⚠️ Desde la Filial Trelew "Chanchi Estévez" te informamos que registrás cuotas pendientes con la filial (${socio.fecha_deuda ? `desde el ${socio.fecha_deuda}` : 'meses anteriores'}). Te recordamos que al mantener deuda se suspenden temporalmente los beneficios y descuentos institucionales. Podés regularizar respondiendo a este mensaje para ponernos al día. ¡Racing Club! 🔵⚪🔵`
-                  : `¡Hola ${socio.nombre}! 💙 Te recordamos desde la Filial Trelew "Chanchi Estévez" que hasta el día 15 recibimos el aporte de la cuota societaria para estar al día y mantener activos todos tus beneficios. ¡Académico! ⚽`;
+                  ? `¡Hola ${nombreCompleto}! ⚠️ Desde la Filial Trelew "Chanchi Estévez" te informamos que registrás cuotas pendientes con la filial (${socio.fecha_deuda ? `desde el ${socio.fecha_deuda}` : 'meses anteriores'}). Te recordamos que al mantener deuda se suspenden temporalmente los beneficios y descuentos institucionales. Podés regularizar respondiendo a este mensaje para ponernos al día. ¡Racing Club! 🔵⚪🔵`
+                  : `¡Hola ${nombreCompleto}! 💙 Te recordamos desde la Filial Trelew "Chanchi Estévez" que hasta el día 15 recibimos el aporte de la cuota societaria para estar al día y mantener activos todos tus beneficios. ¡Académico! ⚽`;
 
                 return (
                   <div key={socio.id} className="bg-slate-950 border border-slate-800 p-3 rounded-xl flex flex-col justify-between">
@@ -324,7 +375,7 @@ export default function AdminSociosPage() {
 
                     <div className="mt-3 flex gap-2">
                       <a
-                        href={`https://wa.me/${socio.telefono.replace(/\D/g, '')}?text=${encodeURIComponent(mensajeWp)}`}
+                        href={`https://wa.me/${telefono}?text=${encodeURIComponent(mensajeWp)}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className={`flex-1 text-center py-2 px-3 rounded-lg text-xs font-bold uppercase transition-all shadow cursor-pointer ${
@@ -341,61 +392,102 @@ export default function AdminSociosPage() {
           )}
         </div>
 
-        {/* Listado de Socios */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {socios.map((socio) => (
-            <div 
-              key={socio.id} 
-              className="bg-slate-900/90 backdrop-blur border border-slate-800 rounded-2xl overflow-hidden shadow-xl hover:border-sky-500/50 transition-all flex flex-col"
-            >
-              <div className="flex items-start p-5 gap-4">
-                <div className="w-20 h-24 bg-slate-950 rounded-xl overflow-hidden flex-shrink-0 border border-slate-800">
-                  <img 
-                    src={socio.foto_url || '/logos/Logo1.png'} 
-                    alt={`Foto de ${socio.nombre}`} 
-                    className="w-full h-full object-cover object-top"
-                  />
-                </div>
-
-                <div className="flex-1">
-                  <h3 className="font-bold text-base leading-tight uppercase text-slate-100">
-                    {socio.nombre} {socio.apellido}
-                  </h3>
-                  <p className="text-sky-400 text-xs font-semibold mt-1">DNI: {socio.dni}</p>
-                  
-                  <div className="mt-2 space-y-1 text-xs text-slate-400">
-                    <p className="text-sky-200 font-mono font-bold">
-                      N° Filial: {socio.numero_socio_filial ? `#${socio.numero_socio_filial}` : 'Sin asignar'}
-                    </p>
-                    <p className={`font-bold ${socio.cuota_al_dia === 'si' ? 'text-emerald-400' : 'text-orange-400'}`}>
-                      Cuota: {socio.cuota_al_dia === 'si' ? '🟢 Al día' : '🟠 En deuda'}
-                    </p>
-                    {socio.socio_racing && socio.socio_racing !== 'No es socio' && (
-                      <p className="text-yellow-400 text-[11px]">Racing N° {socio.socio_racing}</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-slate-950/80 p-3 border-t border-slate-800 flex justify-between items-center mt-auto">
-                <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider ${
-                  socio.estado === 'pendiente' ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30' :
-                  socio.estado === 'aprobado' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' :
-                  'bg-red-500/20 text-red-400 border border-red-500/30'
-                }`}>
-                  {socio.estado || 'pendiente'}
-                </span>
-                
-                <Link 
-                  href={`/admin/${socio.id}`}
-                  className="text-xs font-bold text-sky-400 hover:text-sky-300 transition-colors uppercase cursor-pointer bg-sky-950/60 border border-sky-500/30 px-3 py-1.5 rounded-lg"
-                >
-                  Gestionar →
-                </Link>
-              </div>
+        <section className="overflow-hidden rounded-2xl border border-sky-400/15 bg-slate-900/70 shadow-2xl shadow-black/20 backdrop-blur-xl">
+          <div className="flex flex-col gap-3 border-b border-slate-700/70 p-5 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-lg font-bold uppercase tracking-wide text-sky-300">Padrón de socios</h2>
+              <p className="mt-1 text-xs text-slate-400">
+                {sociosFiltrados.length} de {socios.length} socios
+              </p>
             </div>
-          ))}
-        </div>
+            <label className="relative block w-full sm:max-w-sm">
+              <span className="sr-only">Buscar por DNI, apellido o nombre</span>
+              <input
+                type="search"
+                value={filtroSocios}
+                onChange={(event) => setFiltroSocios(event.target.value)}
+                placeholder="Buscar por DNI o apellido..."
+                className="w-full rounded-xl border border-slate-700 bg-slate-950/80 px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-sky-400 focus:ring-2 focus:ring-sky-400/20"
+              />
+            </label>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-slate-800 text-left text-sm">
+              <thead className="bg-slate-950/70 text-[11px] uppercase tracking-wider text-slate-400">
+                <tr>
+                  <th scope="col" className="px-5 py-3 font-bold">Socio</th>
+                  <th scope="col" className="px-5 py-3 font-bold">DNI</th>
+                  <th scope="col" className="px-5 py-3 font-bold">N° filial</th>
+                  <th scope="col" className="px-5 py-3 font-bold">Cuota</th>
+                  <th scope="col" className="px-5 py-3 font-bold">Solicitud</th>
+                  <th scope="col" className="px-5 py-3 text-right font-bold">Gestión</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-800/80">
+                {sociosFiltrados.map((socio) => {
+                  const estado = socio.estado || 'pendiente';
+                  const alDia = socio.cuota_al_dia === 'si';
+                  const estadoClase = estado === 'aprobado'
+                    ? 'border-emerald-400/25 bg-emerald-400/10 text-emerald-300'
+                    : estado === 'pendiente'
+                      ? 'border-amber-400/25 bg-amber-400/10 text-amber-200'
+                      : 'border-red-400/25 bg-red-400/10 text-red-300';
+
+                  return (
+                    <tr key={socio.id} className="transition-colors hover:bg-sky-400/[0.04]">
+                      <td className="whitespace-nowrap px-5 py-4">
+                        <div className="flex items-center gap-3">
+                          <img
+                            src={socio.foto_url || '/logos/Logo1.png'}
+                            alt=""
+                            className="h-10 w-10 rounded-lg border border-slate-700 object-cover object-top"
+                          />
+                          <span className="font-bold uppercase text-slate-100">
+                            {socio.apellido}, {socio.nombre}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="whitespace-nowrap px-5 py-4 font-mono text-sky-200">{socio.dni}</td>
+                      <td className="whitespace-nowrap px-5 py-4 font-mono text-slate-300">
+                        {socio.numero_socio_filial ? `#${socio.numero_socio_filial}` : 'Sin asignar'}
+                      </td>
+                      <td className="whitespace-nowrap px-5 py-4">
+                        <span className={`inline-flex rounded-full border px-2.5 py-1 text-[10px] font-black uppercase tracking-wide ${
+                          alDia
+                            ? 'border-emerald-400/25 bg-emerald-400/10 text-emerald-300'
+                            : 'border-red-400/25 bg-red-400/10 text-red-300'
+                        }`}>
+                          {alDia ? 'Al día' : 'Deudor'}
+                        </span>
+                      </td>
+                      <td className="whitespace-nowrap px-5 py-4">
+                        <span className={`inline-flex rounded-full border px-2.5 py-1 text-[10px] font-black uppercase tracking-wide ${estadoClase}`}>
+                          {estado}
+                        </span>
+                      </td>
+                      <td className="whitespace-nowrap px-5 py-4 text-right">
+                        <Link
+                          href={`/admin/${socio.id}`}
+                          className="inline-flex rounded-lg border border-sky-500/30 bg-sky-950/60 px-3 py-2 text-xs font-bold uppercase text-sky-300 transition hover:border-sky-300 hover:text-white"
+                        >
+                          Gestionar →
+                        </Link>
+                      </td>
+                    </tr>
+                  );
+                })}
+                {sociosFiltrados.length === 0 && (
+                  <tr>
+                    <td colSpan={6} className="px-5 py-12 text-center text-sm text-slate-400">
+                      {socios.length === 0 ? 'Todavía no hay socios registrados.' : 'No se encontraron socios con ese criterio.'}
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </section>
 
         {/* MODAL DE ALTA MANUAL DE SOCIO */}
         {modalAbierto && (

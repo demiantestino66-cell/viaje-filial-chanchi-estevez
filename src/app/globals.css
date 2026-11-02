@@ -41,3 +41,229 @@ body {
   transform: rotateY(180deg);
   -webkit-transform: rotateY(180deg);
 }
+
+.card-perspective {
+  perspective: 1000px;
+}
+
+.carnet-card {
+  --glare-x: 50%;
+  --glare-y: 50%;
+  --glare-opacity: 0;
+  transform: rotateX(0deg) rotateY(0deg);
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.carnet-fields,
+.print-carnet-card {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
+
+.carnet-photo {
+  position: absolute;
+  top: 56%;
+  left: 2.5%;
+  width: 21%;
+  height: 37%;
+  border: 1px solid rgb(14 165 233 / 45%);
+  border-radius: 0.5rem;
+  object-fit: cover;
+  object-position: top;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 45%);
+}
+
+.carnet-name,
+.carnet-dni,
+.carnet-racing,
+.carnet-filial {
+  position: absolute;
+  color: #fff;
+  font-weight: 900;
+  text-shadow: 0 1px 2px #020617, 0 0 5px #0284c7, 0 2px 8px rgb(0 0 0 / 85%);
+  white-space: nowrap;
+}
+
+.carnet-name {
+  top: 60%;
+  left: 34.2%;
+  max-width: 63%;
+  overflow: hidden;
+  font-size: clamp(8px, 2.8vw, 11px);
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+}
+
+.carnet-dni {
+  top: 67.2%;
+  left: 30.5%;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+.carnet-racing {
+  top: 74.5%;
+  left: 46.5%;
+  max-width: 50%;
+  overflow: hidden;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 9.5px;
+  text-overflow: ellipsis;
+}
+
+.carnet-filial {
+  top: 80.5%;
+  left: 38.5%;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+.carnet-glare {
+  background: radial-gradient(
+    circle at var(--glare-x) var(--glare-y),
+    rgb(255 255 255 / 48%),
+    rgb(125 211 252 / 18%) 18%,
+    transparent 55%
+  );
+  opacity: var(--glare-opacity);
+  mix-blend-mode: screen;
+  transition: opacity 180ms ease;
+}
+
+.print-carnet-root {
+  display: none;
+}
+
+.print-carnet-card {
+  width: 85.6mm;
+  height: 54mm;
+  flex: 0 0 85.6mm;
+  border-radius: 3mm;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+.print-carnet-card .carnet-photo {
+  border-radius: 1mm;
+}
+
+.print-carnet-card .carnet-name {
+  font-size: 2.6mm;
+}
+
+.print-carnet-card .carnet-dni,
+.print-carnet-card .carnet-filial {
+  font-size: 2.4mm;
+}
+
+.print-carnet-card .carnet-racing {
+  font-size: 2.25mm;
+}
+
+@keyframes portal-backdrop-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes portal-backdrop-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes portal-dialog-in {
+  from { opacity: 0; transform: scale(0.96) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes portal-dialog-out {
+  from { opacity: 1; transform: scale(1) translateY(0); }
+  to { opacity: 0; transform: scale(0.97) translateY(6px); }
+}
+
+.portal-backdrop-enter {
+  animation: portal-backdrop-in 180ms ease-out both;
+}
+
+.portal-backdrop-exit {
+  animation: portal-backdrop-out 180ms ease-in both;
+}
+
+.portal-dialog-enter {
+  animation: portal-dialog-in 220ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.portal-dialog-exit {
+  animation: portal-dialog-out 160ms ease-in both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .carnet-card {
+    transition: none;
+    transform: none !important;
+  }
+
+  .carnet-glare {
+    display: none;
+  }
+
+  .portal-backdrop-enter,
+  .portal-backdrop-exit,
+  .portal-dialog-enter,
+  .portal-dialog-exit {
+    animation-duration: 1ms;
+  }
+}
+
+@page {
+  size: A4 portrait;
+  margin: 0;
+}
+
+@media print {
+  html,
+  body {
+    width: 210mm;
+    height: 297mm;
+    margin: 0 !important;
+    background: #fff !important;
+  }
+
+  body.printing-carnet * {
+    visibility: hidden !important;
+  }
+
+  body.printing-carnet .print-carnet-root,
+  body.printing-carnet .print-carnet-root * {
+    visibility: visible !important;
+  }
+
+  body.printing-carnet .portal-dialog-enter,
+  body.printing-carnet .portal-dialog-exit {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  body.printing-carnet .print-carnet-root {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    display: flex !important;
+    width: 210mm;
+    height: 297mm;
+    align-items: center;
+    justify-content: center;
+    gap: 8mm;
+    box-sizing: border-box;
+    padding: 12mm;
+    overflow: hidden;
+    background: #fff;
+  }
+}
