@@ -81,7 +81,11 @@ export default function LoginPage() {
           break;
         case 'error':
           setErrorSocio(resultado.mensaje);
+          break;
       }
+    } catch (error) {
+      console.error('[Supabase socios] error inesperado al buscar socio', error);
+      setErrorSocio('No se pudo completar la consulta. Revisá tu conexión e intentá nuevamente.');
     } finally {
       setBuscandoSocio(false);
     }

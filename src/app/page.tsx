@@ -109,34 +109,40 @@ export default function HomePage() {
     setSocioEncontrado(null);
     setBuscandoSocio(true);
 
-    const resultado = await buscarSocioPorDni(dniConsulta);
-    switch (resultado.tipo) {
-      case 'encontrado':
-        setSocioEncontrado(resultado.socio);
-        break;
-      case 'pendiente':
-        setErrorSocio(
-          `Tu solicitud se encuentra en estado: "${resultado.estado}". Aún no ha sido aprobada.`,
-        );
-        break;
-      case 'dni-invalido':
-        setErrorSocio('Ingresá un DNI válido de 7 u 8 números.');
-        break;
-      case 'padron-vacio':
-        setErrorSocio(
-          'No hay registros del padrón visibles para esta consulta. Si el DNI está correcto, contactá a la comisión.',
-        );
-        break;
-      case 'sin-coincidencia':
-        setErrorSocio(
-          'No encontramos un socio con ese DNI. Revisá el número o solicitá tu carnet si todavía no estás registrado.',
-        );
-        break;
-      case 'error':
-        setErrorSocio(resultado.mensaje);
-        break;
+    try {
+      const resultado = await buscarSocioPorDni(dniConsulta);
+      switch (resultado.tipo) {
+        case 'encontrado':
+          setSocioEncontrado(resultado.socio);
+          break;
+        case 'pendiente':
+          setErrorSocio(
+            `Tu solicitud se encuentra en estado: "${resultado.estado}". Aún no ha sido aprobada.`,
+          );
+          break;
+        case 'dni-invalido':
+          setErrorSocio('Ingresá un DNI válido de 7 u 8 números.');
+          break;
+        case 'padron-vacio':
+          setErrorSocio(
+            'No hay registros del padrón visibles para esta consulta. Si el DNI está correcto, contactá a la comisión.',
+          );
+          break;
+        case 'sin-coincidencia':
+          setErrorSocio(
+            'No encontramos un socio con ese DNI. Revisá el número o solicitá tu carnet si todavía no estás registrado.',
+          );
+          break;
+        case 'error':
+          setErrorSocio(resultado.mensaje);
+          break;
+      }
+    } catch (error) {
+      console.error('[Supabase socios] error inesperado al buscar socio', error);
+      setErrorSocio('No se pudo completar la consulta. Revisá tu conexión e intentá nuevamente.');
+    } finally {
+      setBuscandoSocio(false);
     }
-    setBuscandoSocio(false);
   };
 
   const handleEnviarConsulta = (event: React.FormEvent<HTMLFormElement>) => {
