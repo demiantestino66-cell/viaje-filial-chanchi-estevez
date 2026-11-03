@@ -220,8 +220,10 @@ export default function AdminSociosPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center font-sans">
-        <p className="text-sky-400 font-bold animate-pulse text-sm">Verificando acceso y cargando socios...</p>
+      <div className="flex min-h-screen items-center justify-center bg-[#050b16] font-sans text-white">
+        <p className="animate-pulse rounded-2xl border border-white/10 bg-white/[0.04] px-6 py-4 text-sm font-semibold text-sky-200 shadow-2xl backdrop-blur-md">
+          Verificando acceso y cargando socios...
+        </p>
       </div>
     );
   }
@@ -229,7 +231,7 @@ export default function AdminSociosPage() {
   if (!authenticated) {
     if (!errorMsg) return null;
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-950 p-4 text-center text-sm text-red-300">
+      <div className="flex min-h-screen items-center justify-center bg-[#050b16] p-4 text-center text-sm text-rose-200">
         No se pudo verificar el acceso: {errorMsg}
       </div>
     );
@@ -251,104 +253,139 @@ export default function AdminSociosPage() {
       nombre.includes(filtroDiferido)
     );
   });
+  const sociosAlDia = socios.filter((socio) => socio.cuota_al_dia === 'si').length;
+  const sociosMorosos = socios.filter((socio) => socio.cuota_al_dia === 'no').length;
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white p-4 md:p-12 font-sans relative">
+    <main className="relative min-h-screen overflow-hidden bg-[#050b16] p-4 font-sans text-white sm:p-6 lg:p-10">
       
       {/* Sello / Marca de agua institucional de fondo */}
-      <div className="fixed inset-0 pointer-events-none flex items-center justify-center opacity-5 overflow-hidden z-0">
-        <img src="/logos/Logo1.png" alt="Marca de agua Filial" className="w-[600px] h-[600px] object-contain" />
+      <div className="pointer-events-none fixed inset-0 z-0 flex items-center justify-center overflow-hidden opacity-[0.035]">
+        <img src="/logos/Logo1.png" alt="Marca de agua Filial" className="h-[min(80vw,700px)] w-[min(80vw,700px)] object-contain" />
       </div>
 
-      <div className="max-w-6xl mx-auto relative z-10">
+      <div className="relative z-10 mx-auto max-w-7xl">
         
         {/* Cabecera */}
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end mb-8 border-b border-slate-800 pb-4 gap-4">
+        <header className="mb-6 flex flex-col gap-5 rounded-3xl border border-white/10 bg-white/[0.04] p-5 shadow-2xl shadow-black/20 backdrop-blur-md sm:flex-row sm:items-center sm:justify-between sm:p-7">
           <div>
-            <h1 className="text-3xl font-black text-sky-400 uppercase tracking-wide">
+            <p className="mb-2 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.24em] text-sky-300/75">
+              <span className="h-1.5 w-1.5 rounded-full bg-sky-400 shadow-[0_0_12px_rgba(56,189,248,0.9)]" />
+              Filial Trelew · Chanchi Estévez
+            </p>
+            <h1 className="text-2xl font-black uppercase tracking-tight text-white sm:text-3xl">
               Panel de Administración
             </h1>
-            <p className="text-sm text-slate-400 mt-1">
-            Gestión de Socios - Filial Trelew “Chanchi Estévez”
+            <p className="mt-1.5 text-sm text-slate-400">
+              Gestión centralizada del padrón de socios
             </p>
           </div>
           
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="grid grid-cols-1 gap-2 sm:flex sm:flex-wrap sm:items-center">
             <button
               onClick={() => setModalAbierto(true)}
-              className="bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-black px-4 py-2.5 rounded-xl transition-colors cursor-pointer uppercase tracking-wider shadow-lg shadow-sky-500/20"
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-sky-300 to-sky-500 px-4 py-2.5 text-xs font-black uppercase tracking-wider text-slate-950 shadow-lg shadow-sky-500/20 transition-all duration-300 hover:scale-[1.03] hover:from-sky-200 hover:to-sky-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300"
             >
-              ➕ Nuevo Socio Manual
+              <span aria-hidden="true">＋</span> Nuevo Socio Manual
             </button>
 
             <button
               onClick={exportarAExcel}
-              className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black px-4 py-2.5 rounded-xl transition-colors cursor-pointer uppercase tracking-wider shadow-lg shadow-emerald-600/20 flex items-center gap-1.5"
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-emerald-300/20 bg-emerald-400/10 px-4 py-2.5 text-xs font-black uppercase tracking-wider text-emerald-200 transition-all duration-300 hover:scale-[1.03] hover:bg-emerald-400/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300"
             >
-              📊 Exportar a Excel
+              <span aria-hidden="true">↧</span> Exportar a Excel
             </button>
-
-            <div className="bg-slate-900 border border-slate-800 px-4 py-2 rounded-xl">
-              <span className="text-sm text-slate-300">Total: </span>
-              <span className="font-bold text-sky-400">{socios.length}</span>
-            </div>
 
             <button
               onClick={async () => {
                 await supabase.auth.signOut();
                 router.push('/login');
               }}
-              className="bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500/20 text-xs font-bold px-3 py-2.5 rounded-xl transition-colors cursor-pointer"
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-rose-400/20 bg-rose-400/[0.07] px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-rose-200/90 transition-all duration-300 hover:scale-[1.03] hover:bg-rose-400/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-300"
             >
-              Cerrar Sesión
+              <span aria-hidden="true">↗</span> Cerrar Sesión
             </button>
           </div>
-        </div>
+        </header>
+
+        <section aria-label="Métricas del padrón" className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
+          <article className="group relative overflow-hidden rounded-2xl border border-sky-300/15 bg-gradient-to-br from-sky-400/[0.12] to-white/[0.035] p-5 shadow-xl shadow-black/10 backdrop-blur-md transition duration-300 hover:-translate-y-0.5 hover:border-sky-300/30">
+            <div className="absolute -right-7 -top-8 h-28 w-28 rounded-full bg-sky-400/10 blur-2xl transition group-hover:bg-sky-300/20" />
+            <div className="relative flex items-center justify-between">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Total socios</p>
+                <p className="mt-2 text-3xl font-black tabular-nums text-white">{socios.length}</p>
+              </div>
+              <span className="flex h-12 w-12 items-center justify-center rounded-2xl border border-sky-300/15 bg-sky-300/10 text-xl text-sky-200" aria-hidden="true">◎</span>
+            </div>
+          </article>
+          <article className="group relative overflow-hidden rounded-2xl border border-emerald-300/15 bg-gradient-to-br from-emerald-400/[0.1] to-white/[0.035] p-5 shadow-xl shadow-black/10 backdrop-blur-md transition duration-300 hover:-translate-y-0.5 hover:border-emerald-300/30">
+            <div className="absolute -right-7 -top-8 h-28 w-28 rounded-full bg-emerald-400/10 blur-2xl transition group-hover:bg-emerald-300/20" />
+            <div className="relative flex items-center justify-between">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Al día</p>
+                <p className="mt-2 text-3xl font-black tabular-nums text-emerald-200">{sociosAlDia}</p>
+              </div>
+              <span className="flex h-12 w-12 items-center justify-center rounded-2xl border border-emerald-300/15 bg-emerald-300/10 text-xl text-emerald-200" aria-hidden="true">✓</span>
+            </div>
+          </article>
+          <article className="group relative overflow-hidden rounded-2xl border border-rose-300/15 bg-gradient-to-br from-rose-400/[0.1] to-white/[0.035] p-5 shadow-xl shadow-black/10 backdrop-blur-md transition duration-300 hover:-translate-y-0.5 hover:border-rose-300/30">
+            <div className="absolute -right-7 -top-8 h-28 w-28 rounded-full bg-rose-400/10 blur-2xl transition group-hover:bg-rose-300/20" />
+            <div className="relative flex items-center justify-between">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Morosos</p>
+                <p className="mt-2 text-3xl font-black tabular-nums text-rose-200">{sociosMorosos}</p>
+              </div>
+              <span className="flex h-12 w-12 items-center justify-center rounded-2xl border border-rose-300/15 bg-rose-300/10 text-xl text-rose-200" aria-hidden="true">!</span>
+            </div>
+          </article>
+        </section>
 
         {errorMsg && (
-          <div className="bg-red-500/20 border border-red-500 p-4 rounded-xl mb-6 text-sm text-red-300">
+          <div className="mb-6 rounded-2xl border border-red-400/25 bg-red-400/10 p-4 text-sm text-red-200 backdrop-blur-md" role="alert">
             {errorMsg}
           </div>
         )}
 
         {/* PANEL DE CENTRO DE MENSAJERÍA WHATSAPP (SIN BLOQUEO DE POP-UPS) */}
-        <div className="bg-slate-900/95 backdrop-blur border border-slate-800 rounded-2xl p-6 mb-8 shadow-xl">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 pb-3 border-b border-slate-800 gap-3">
+        <section className="mb-6 rounded-3xl border border-white/10 bg-white/[0.04] p-4 shadow-2xl shadow-black/20 backdrop-blur-md sm:p-6">
+          <div className="mb-5 flex flex-col gap-4 border-b border-white/[0.08] pb-5 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <h2 className="text-lg font-bold text-sky-400 uppercase tracking-wide flex items-center gap-2">
-                📱 Centro de Avisos por WhatsApp (Días 5, 10 y 15)
+              <h2 className="flex items-center gap-2 text-base font-bold uppercase tracking-wide text-white sm:text-lg">
+                <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-sky-400/10 text-sky-300" aria-hidden="true">↗</span>
+                Centro de avisos por WhatsApp
               </h2>
-              <p className="text-xs text-slate-400 mt-1">
+              <p className="mt-2 text-xs leading-relaxed text-slate-400">
                 Dispará los recordatorios de cuota o avisos de deuda de forma segura y directa con un solo clic por socio.
               </p>
             </div>
 
-            <div className="flex bg-slate-950 p-1 rounded-xl border border-slate-800">
+            <div className="grid grid-cols-2 gap-1 rounded-xl border border-white/10 bg-slate-950/60 p-1">
               <button
                 onClick={() => setFiltroWp('deuda')}
-                className={`text-xs font-bold px-3 py-1.5 rounded-lg uppercase transition-all cursor-pointer ${
-                  filtroWp === 'deuda' ? 'bg-orange-600 text-white shadow' : 'text-slate-400 hover:text-white'
+                className={`rounded-lg px-3 py-2 text-[10px] font-bold uppercase tracking-wide transition-all duration-300 cursor-pointer sm:text-xs ${
+                  filtroWp === 'deuda' ? 'bg-rose-400/15 text-rose-200 shadow' : 'text-slate-400 hover:text-white'
                 }`}
               >
-                ⚠️ Morosos ({socios.filter(s => s.cuota_al_dia === 'no' && s.telefono).length})
+                Morosos ({socios.filter(s => s.cuota_al_dia === 'no' && s.telefono).length})
               </button>
               <button
                 onClick={() => setFiltroWp('todos')}
-                className={`text-xs font-bold px-3 py-1.5 rounded-lg uppercase transition-all cursor-pointer ${
-                  filtroWp === 'todos' ? 'bg-sky-600 text-white shadow' : 'text-slate-400 hover:text-white'
+                className={`rounded-lg px-3 py-2 text-[10px] font-bold uppercase tracking-wide transition-all duration-300 cursor-pointer sm:text-xs ${
+                  filtroWp === 'todos' ? 'bg-sky-400/15 text-sky-200 shadow' : 'text-slate-400 hover:text-white'
                 }`}
               >
-                📢 Todos con Teléfono ({socios.filter(s => s.telefono && s.telefono.trim() !== '').length})
+                Todos ({socios.filter(s => s.telefono && s.telefono.trim() !== '').length})
               </button>
             </div>
           </div>
 
           {sociosParaWp.length === 0 ? (
-            <div className="text-center py-6 text-slate-500 text-xs uppercase tracking-wider font-bold">
+            <div className="rounded-2xl border border-dashed border-white/10 py-10 text-center text-xs font-semibold uppercase tracking-wider text-slate-500">
               No hay socios en esta categoría con teléfono registrado.
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[350px] overflow-y-auto pr-2">
+            <div className="grid max-h-[420px] grid-cols-1 gap-3 overflow-y-auto pr-1 sm:grid-cols-2 xl:grid-cols-3">
               {sociosParaWp.map((socio) => {
                 const esDeudor = socio.cuota_al_dia === 'no';
                 const telefono = (socio.telefono ?? '').replace(/\D/g, '');
@@ -358,45 +395,43 @@ export default function AdminSociosPage() {
                   : `¡Hola ${nombreCompleto}! 💙 Te recordamos desde la Filial Trelew "Chanchi Estévez" que hasta el día 15 recibimos el aporte de la cuota societaria para estar al día y mantener activos todos tus beneficios. ¡Académico! ⚽`;
 
                 return (
-                  <div key={socio.id} className="bg-slate-950 border border-slate-800 p-3 rounded-xl flex flex-col justify-between">
-                    <div>
-                      <div className="flex justify-between items-start mb-1">
-                        <span className="font-bold text-xs uppercase text-slate-200 truncate max-w-[150px]">
+                  <article key={socio.id} className="flex flex-col justify-between rounded-2xl border border-white/[0.08] bg-slate-950/45 p-4 transition-all duration-300 hover:border-sky-300/20 hover:bg-white/[0.055]">
+                    <div className="flex min-w-0 items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-bold uppercase text-slate-100">
                           {socio.nombre} {socio.apellido}
-                        </span>
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                          esDeudor ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                        </p>
+                        <p className="mt-1 truncate font-mono text-xs text-slate-400">{socio.telefono}</p>
+                      </div>
+                      <span className={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide ${
+                          esDeudor ? 'border-rose-300/20 bg-rose-400/10 text-rose-200' : 'border-emerald-300/20 bg-emerald-400/10 text-emerald-200'
                         }`}>
                           {esDeudor ? 'Deudor' : 'Al Día'}
-                        </span>
-                      </div>
-                      <p className="text-[11px] text-sky-400 font-mono">Tel: {socio.telefono}</p>
+                      </span>
                     </div>
 
-                    <div className="mt-3 flex gap-2">
-                      <a
-                        href={`https://wa.me/${telefono}?text=${encodeURIComponent(mensajeWp)}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={`flex-1 text-center py-2 px-3 rounded-lg text-xs font-bold uppercase transition-all shadow cursor-pointer ${
-                          esDeudor ? 'bg-orange-600 hover:bg-orange-500 text-white' : 'bg-sky-600 hover:bg-sky-500 text-white'
+                    <a
+                      href={`https://wa.me/${telefono}?text=${encodeURIComponent(mensajeWp)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`mt-4 inline-flex min-h-10 items-center justify-center gap-2 rounded-xl px-3 py-2 text-xs font-bold uppercase tracking-wide transition-all duration-300 hover:scale-[1.02] cursor-pointer ${
+                          esDeudor ? 'bg-rose-400/10 text-rose-100 hover:bg-rose-400/20' : 'bg-sky-400/10 text-sky-100 hover:bg-sky-400/20'
                         }`}
-                      >
-                        💬 Enviar WhatsApp
-                      </a>
-                    </div>
-                  </div>
+                    >
+                      <span aria-hidden="true">↗</span> Enviar WhatsApp
+                    </a>
+                  </article>
                 );
               })}
             </div>
           )}
-        </div>
+        </section>
 
-        <section className="overflow-hidden rounded-2xl border border-sky-400/15 bg-slate-900/70 shadow-2xl shadow-black/20 backdrop-blur-xl">
-          <div className="flex flex-col gap-3 border-b border-slate-700/70 p-5 sm:flex-row sm:items-center sm:justify-between">
+        <section className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] shadow-2xl shadow-black/20 backdrop-blur-md">
+          <div className="flex flex-col gap-4 border-b border-white/[0.08] p-4 sm:flex-row sm:items-center sm:justify-between sm:p-6">
             <div>
-              <h2 className="text-lg font-bold uppercase tracking-wide text-sky-300">Padrón de socios</h2>
-              <p className="mt-1 text-xs text-slate-400">
+              <h2 className="text-lg font-bold uppercase tracking-wide text-white">Padrón de socios</h2>
+              <p className="mt-1.5 text-xs text-slate-400">
                 {sociosFiltrados.length} de {socios.length} socios
               </p>
             </div>
@@ -406,15 +441,73 @@ export default function AdminSociosPage() {
                 type="search"
                 value={filtroSocios}
                 onChange={(event) => setFiltroSocios(event.target.value)}
-                placeholder="Buscar por DNI o apellido..."
-                className="w-full rounded-xl border border-slate-700 bg-slate-950/80 px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-sky-400 focus:ring-2 focus:ring-sky-400/20"
+                placeholder="Buscar por DNI, nombre o apellido..."
+                className="w-full rounded-xl border border-white/10 bg-slate-950/60 px-4 py-3 text-sm text-white outline-none transition-all placeholder:text-slate-500 focus:border-sky-300/50 focus:ring-2 focus:ring-sky-300/15"
               />
             </label>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-slate-800 text-left text-sm">
-              <thead className="bg-slate-950/70 text-[11px] uppercase tracking-wider text-slate-400">
+          <div className="space-y-3 p-3 md:hidden">
+            {sociosFiltrados.map((socio) => {
+              const estado = socio.estado || 'pendiente';
+              const alDia = socio.cuota_al_dia === 'si';
+              const estadoClase = estado === 'aprobado'
+                ? 'border-emerald-300/20 bg-emerald-400/10 text-emerald-200'
+                : estado === 'pendiente'
+                  ? 'border-amber-300/20 bg-amber-400/10 text-amber-200'
+                  : 'border-rose-300/20 bg-rose-400/10 text-rose-200';
+
+              return (
+                <article key={socio.id} className="rounded-2xl border border-white/[0.08] bg-slate-950/40 p-4">
+                  <div className="flex items-start gap-3">
+                    <img
+                      src={socio.foto_url || '/logos/Logo1.png'}
+                      alt=""
+                      className="h-12 w-12 shrink-0 rounded-xl border border-white/10 object-cover object-top"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <h3 className="truncate text-sm font-bold uppercase text-white">
+                        {socio.apellido}, {socio.nombre}
+                      </h3>
+                      <p className="mt-1 font-mono text-xs text-slate-400">DNI {socio.dni}</p>
+                      <p className="mt-0.5 font-mono text-[11px] text-slate-500">
+                        N° filial {socio.numero_socio_filial ? `#${socio.numero_socio_filial}` : 'Sin asignar'}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex flex-wrap gap-2">
+                      <span className={`inline-flex rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide ${
+                        alDia
+                          ? 'border-emerald-300/20 bg-emerald-400/10 text-emerald-200'
+                          : 'border-rose-300/20 bg-rose-400/10 text-rose-200'
+                      }`}>
+                        {alDia ? 'Al día' : 'Deudor'}
+                      </span>
+                      <span className={`inline-flex rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide ${estadoClase}`}>
+                        {estado}
+                      </span>
+                    </div>
+                    <Link
+                      href={`/admin/${socio.id}`}
+                      className="inline-flex min-h-9 items-center rounded-xl border border-sky-300/15 bg-sky-300/[0.08] px-3 py-2 text-xs font-bold uppercase text-sky-200 transition-all duration-300 hover:bg-sky-300/15 hover:text-white"
+                    >
+                      Gestionar →
+                    </Link>
+                  </div>
+                </article>
+              );
+            })}
+            {sociosFiltrados.length === 0 && (
+              <div className="rounded-2xl border border-dashed border-white/10 px-4 py-10 text-center text-sm text-slate-400">
+                {socios.length === 0 ? 'Todavía no hay socios registrados.' : 'No se encontraron socios con ese criterio.'}
+              </div>
+            )}
+          </div>
+
+          <div className="hidden overflow-x-auto md:block">
+            <table className="min-w-[760px] divide-y divide-white/[0.07] text-left text-sm">
+              <thead className="bg-white/[0.025] text-[10px] uppercase tracking-[0.16em] text-slate-500">
                 <tr>
                   <th scope="col" className="px-5 py-3 font-bold">Socio</th>
                   <th scope="col" className="px-5 py-3 font-bold">DNI</th>
@@ -424,7 +517,7 @@ export default function AdminSociosPage() {
                   <th scope="col" className="px-5 py-3 text-right font-bold">Gestión</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/80">
+              <tbody className="divide-y divide-white/[0.06]">
                 {sociosFiltrados.map((socio) => {
                   const estado = socio.estado || 'pendiente';
                   const alDia = socio.cuota_al_dia === 'si';
@@ -435,13 +528,13 @@ export default function AdminSociosPage() {
                       : 'border-red-400/25 bg-red-400/10 text-red-300';
 
                   return (
-                    <tr key={socio.id} className="transition-colors hover:bg-sky-400/[0.04]">
+                    <tr key={socio.id} className="transition-colors duration-200 hover:bg-sky-300/[0.035]">
                       <td className="whitespace-nowrap px-5 py-4">
                         <div className="flex items-center gap-3">
                           <img
                             src={socio.foto_url || '/logos/Logo1.png'}
                             alt=""
-                            className="h-10 w-10 rounded-lg border border-slate-700 object-cover object-top"
+                            className="h-10 w-10 rounded-xl border border-white/10 object-cover object-top"
                           />
                           <span className="font-bold uppercase text-slate-100">
                             {socio.apellido}, {socio.nombre}
@@ -469,7 +562,7 @@ export default function AdminSociosPage() {
                       <td className="whitespace-nowrap px-5 py-4 text-right">
                         <Link
                           href={`/admin/${socio.id}`}
-                          className="inline-flex rounded-lg border border-sky-500/30 bg-sky-950/60 px-3 py-2 text-xs font-bold uppercase text-sky-300 transition hover:border-sky-300 hover:text-white"
+                          className="inline-flex rounded-xl border border-sky-300/15 bg-sky-300/[0.08] px-3 py-2 text-xs font-bold uppercase text-sky-200 transition-all duration-300 hover:border-sky-200/40 hover:bg-sky-300/15 hover:text-white"
                         >
                           Gestionar →
                         </Link>
@@ -491,15 +584,15 @@ export default function AdminSociosPage() {
 
         {/* MODAL DE ALTA MANUAL DE SOCIO */}
         {modalAbierto && (
-          <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-            <div className="bg-slate-900 border border-sky-500/40 rounded-2xl max-w-lg w-full p-6 shadow-2xl my-8">
-              <div className="flex justify-between items-center mb-4 border-b border-slate-800 pb-3">
-                <h2 className="text-lg font-bold text-sky-400 uppercase tracking-wide">
+          <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/60 p-4 backdrop-blur-md">
+            <div className="my-8 max-h-[calc(100vh-2rem)] w-full max-w-xl overflow-y-auto rounded-2xl border border-white/10 bg-slate-900/90 p-5 shadow-2xl shadow-black/50 sm:p-7">
+              <div className="mb-5 flex items-center justify-between gap-3 border-b border-white/10 pb-4">
+                <h2 className="text-base font-bold uppercase tracking-wide text-white sm:text-lg">
                   ➕ Alta Manual de Socio
                 </h2>
                 <button 
                   onClick={() => setModalAbierto(false)}
-                  className="text-slate-400 hover:text-white font-bold text-sm cursor-pointer"
+                  className="cursor-pointer rounded-lg border border-transparent px-3 py-2 text-xs font-bold text-slate-400 transition-all duration-300 hover:border-white/10 hover:bg-white/5 hover:text-white"
                 >
                   ✕ Cerrar
                 </button>
@@ -509,82 +602,82 @@ export default function AdminSociosPage() {
                 
                 {/* Selector de Foto */}
                 <div className="flex flex-col items-center gap-2">
-                  <div className="w-20 h-24 bg-slate-950 border border-dashed border-sky-500/40 rounded-xl overflow-hidden flex items-center justify-center">
+                  <div className="flex h-24 w-20 items-center justify-center overflow-hidden rounded-2xl border border-dashed border-white/15 bg-white/5">
                     {previewFoto ? (
                       <img src={previewFoto} alt="Preview" className="w-full h-full object-cover object-top" />
                     ) : (
                       <span className="text-[10px] text-slate-500 text-center px-1">Sin foto (Usa logo)</span>
                     )}
                   </div>
-                  <label className="bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-500/40 text-[11px] px-3 py-1 rounded-lg cursor-pointer font-bold uppercase transition-all">
+                  <label className="cursor-pointer rounded-xl border border-sky-300/20 bg-sky-300/10 px-4 py-2 text-[11px] font-bold uppercase text-sky-200 transition-all duration-300 hover:bg-sky-300/20">
                     Subir / Cambiar Foto
                     <input type="file" accept="image/*" onChange={handleFotoChange} className="hidden" />
                   </label>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-400 uppercase mb-1">Nombre *</label>
+                    <label className="mb-1.5 block text-xs font-semibold text-slate-300">Nombre *</label>
                     <input
                       type="text"
                       required
                       value={nuevoSocio.nombre}
                       onChange={(e) => setNuevoSocio({ ...nuevoSocio, nombre: e.target.value })}
-                      className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:border-sky-500 focus:outline-none"
+                      className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-sm text-white outline-none transition-all placeholder:text-slate-500 focus:border-sky-500 focus:ring-2 focus:ring-sky-500 focus:outline-none"
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-400 uppercase mb-1">Apellido *</label>
+                    <label className="mb-1.5 block text-xs font-semibold text-slate-300">Apellido *</label>
                     <input
                       type="text"
                       required
                       value={nuevoSocio.apellido}
                       onChange={(e) => setNuevoSocio({ ...nuevoSocio, apellido: e.target.value })}
-                      className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:border-sky-500 focus:outline-none"
+                      className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-sm text-white outline-none transition-all placeholder:text-slate-500 focus:border-sky-500 focus:ring-2 focus:ring-sky-500 focus:outline-none"
                     />
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-400 uppercase mb-1">DNI *</label>
+                    <label className="mb-1.5 block text-xs font-semibold text-slate-300">DNI *</label>
                     <input
                       type="text"
                       required
                       value={nuevoSocio.dni}
                       onChange={(e) => setNuevoSocio({ ...nuevoSocio, dni: e.target.value })}
-                      className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:border-sky-500 focus:outline-none"
+                      className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-sm text-white outline-none transition-all placeholder:text-slate-500 focus:border-sky-500 focus:ring-2 focus:ring-sky-500 focus:outline-none"
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] font-bold text-sky-400 uppercase mb-1">N° Socio Filial *</label>
+                    <label className="mb-1.5 block text-xs font-semibold text-slate-300">N° Socio Filial *</label>
                     <input
                       type="text"
                       required
                       placeholder="Ej: 0015"
                       value={nuevoSocio.numero_socio_filial}
                       onChange={(e) => setNuevoSocio({ ...nuevoSocio, numero_socio_filial: e.target.value })}
-                      className="w-full bg-slate-950 border border-sky-500/50 rounded-lg p-2.5 text-sm font-mono text-sky-300 focus:border-sky-400 focus:outline-none"
+                      className="w-full rounded-xl border border-white/10 bg-white/5 p-3 font-mono text-sm text-white outline-none transition-all placeholder:text-slate-500 focus:border-sky-500 focus:ring-2 focus:ring-sky-500 focus:outline-none"
                     />
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-400 uppercase mb-1">Teléfono</label>
+                    <label className="mb-1.5 block text-xs font-semibold text-slate-300">Teléfono</label>
                     <input
                       type="text"
                       value={nuevoSocio.telefono}
                       onChange={(e) => setNuevoSocio({ ...nuevoSocio, telefono: e.target.value })}
-                      className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:border-sky-500 focus:outline-none"
+                      className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-sm text-white outline-none transition-all placeholder:text-slate-500 focus:border-sky-500 focus:ring-2 focus:ring-sky-500 focus:outline-none"
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-400 uppercase mb-1">Localidad</label>
+                    <label className="mb-1.5 block text-xs font-semibold text-slate-300">Localidad</label>
                     <select
                       value={nuevoSocio.localidad}
                       onChange={(e) => setNuevoSocio({ ...nuevoSocio, localidad: e.target.value })}
-                      className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:border-sky-500 focus:outline-none"
+                      className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-sm text-white outline-none transition-all focus:border-sky-500 focus:ring-2 focus:ring-sky-500 focus:outline-none"
                     >
                       <option value="Trelew">Trelew</option>
                       <option value="Rawson">Rawson</option>
@@ -596,23 +689,23 @@ export default function AdminSociosPage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <div>
-                    <label className="block text-[11px] font-bold text-yellow-400 uppercase mb-1">N° Socio Racing</label>
+                    <label className="mb-1.5 block text-xs font-semibold text-slate-300">N° Socio Racing</label>
                     <input
                       type="text"
                       placeholder="Opcional"
                       value={nuevoSocio.socio_racing}
                       onChange={(e) => setNuevoSocio({ ...nuevoSocio, socio_racing: e.target.value })}
-                      className="w-full bg-slate-950 border border-yellow-500/30 rounded-lg p-2.5 text-sm text-yellow-200 focus:border-yellow-400 focus:outline-none"
+                      className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-sm text-white outline-none transition-all placeholder:text-slate-500 focus:border-sky-500 focus:ring-2 focus:ring-sky-500 focus:outline-none"
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] font-bold text-emerald-400 uppercase mb-1">Estado de Cuota</label>
+                    <label className="mb-1.5 block text-xs font-semibold text-slate-300">Estado de Cuota</label>
                     <select
                       value={nuevoSocio.cuota_al_dia}
                       onChange={(e) => setNuevoSocio({ ...nuevoSocio, cuota_al_dia: e.target.value })}
-                      className="w-full bg-slate-950 border border-emerald-500/30 rounded-lg p-2.5 text-sm text-emerald-300 focus:border-emerald-400 focus:outline-none"
+                      className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-sm text-white outline-none transition-all focus:border-sky-500 focus:ring-2 focus:ring-sky-500 focus:outline-none"
                     >
                       <option value="si">Al día (🟢)</option>
                       <option value="no">En deuda (🟠)</option>
@@ -621,19 +714,19 @@ export default function AdminSociosPage() {
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-400 uppercase mb-1">Fecha de Ingreso / Antigüedad</label>
+                  <label className="mb-1.5 block text-xs font-semibold text-slate-300">Fecha de Ingreso / Antigüedad</label>
                   <input
                     type="date"
                     value={nuevoSocio.fecha_inscripcion}
                     onChange={(e) => setNuevoSocio({ ...nuevoSocio, fecha_inscripcion: e.target.value })}
-                    className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:border-sky-500 focus:outline-none"
+                    className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-sm text-white outline-none transition-all focus:border-sky-500 focus:ring-2 focus:ring-sky-500 focus:outline-none"
                   />
                 </div>
 
                 <button
                   type="submit"
                   disabled={guardandoManual}
-                  className="w-full bg-sky-500 hover:bg-sky-400 text-slate-950 font-black py-3 rounded-xl uppercase tracking-wider text-xs transition-colors shadow-lg cursor-pointer disabled:opacity-50 mt-4"
+                  className="mt-4 w-full cursor-pointer rounded-xl bg-gradient-to-r from-sky-300 to-sky-500 py-3 text-xs font-black uppercase tracking-wider text-slate-950 shadow-lg shadow-sky-500/15 transition-all duration-300 hover:scale-105 hover:from-sky-200 hover:to-sky-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {guardandoManual ? 'Registrando Socio...' : '💾 Guardar y Aprobar Socio'}
                 </button>

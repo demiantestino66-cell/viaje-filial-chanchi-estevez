@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
+import { buscarSocioPorDni, type SocioPortal } from '@/lib/socios';
 import { Oswald } from 'next/font/google';
 import CarnetSocio from '@/components/CarnetSocio';
 import SocioSkeleton from '@/components/SocioSkeleton';
@@ -11,17 +12,25 @@ import SocioSkeleton from '@/components/SocioSkeleton';
 const oswald = Oswald({ subsets: ['latin'], weight: ['400', '700'] });
 const WHATSAPP_FILIAL = '5492804588309';
 
-type SocioPortal = {
-  nombre: string;
-  apellido: string;
-  dni: string;
-  estado: string;
-  cuota_al_dia?: string | null;
-  fecha_deuda?: string | null;
-  foto_url?: string | null;
-  socio_racing?: string | null;
-  numero_socio_filial?: string | null;
-};
+function describirErrorAuth(error: unknown) {
+  if (typeof error !== 'object' || error === null) {
+    return { message: 'Error desconocido' };
+  }
+
+  const authError = error as {
+    name?: unknown;
+    message?: unknown;
+    status?: unknown;
+    code?: unknown;
+  };
+
+  return {
+    ...(typeof authError.name === 'string' && { name: authError.name }),
+    ...(typeof authError.status === 'number' && { status: authError.status }),
+    ...(typeof authError.code === 'string' && { code: authError.code }),
+    ...(typeof authError.message === 'string' && { message: authError.message }),
+  };
+}
 
 export default function LoginPage() {
   const [modo, setModo] = useState<'socio' | 'admin'>('socio');
@@ -47,29 +56,32 @@ export default function LoginPage() {
     setSocioEncontrado(null);
 
     try {
-      const { data, error } = await supabase
-        .from('socios')
-        .select(
-          'nombre,apellido,dni,estado,cuota_al_dia,fecha_deuda,foto_url,socio_racing,numero_socio_filial',
-        )
-        .eq('dni', dniConsulta.trim())
-        .maybeSingle();
-
-      if (error) {
-        setErrorSocio(
-          error.code === 'PGRST116'
-            ? 'No se encontró ningún socio registrado con ese DNI.'
-            : 'No se pudo completar la consulta. Intentá nuevamente más tarde.',
-        );
-      } else if (!data) {
-        setErrorSocio('No se encontró ningún socio registrado con ese DNI.');
-      } else if (data.estado !== 'aprobado') {
-        setErrorSocio(`Tu solicitud se encuentra en estado: “${data.estado}”. Aún no está aprobada por la comisión.`);
-      } else {
-        setSocioEncontrado(data);
+      const resultado = await buscarSocioPorDni(dniConsulta);
+      switch (resultado.tipo) {
+        case 'encontrado':
+          setSocioEncontrado(resultado.socio);
+          break;
+        case 'pendiente':
+          setErrorSocio(
+            `Tu solicitud se encuentra en estado: “${resultado.estado}”. Aún no está aprobada por la comisión.`,
+          );
+          break;
+        case 'dni-invalido':
+          setErrorSocio('Ingresá un DNI válido de 7 u 8 números.');
+          break;
+        case 'padron-vacio':
+          setErrorSocio(
+            'No hay registros del padrón visibles para esta consulta. Si el DNI está correcto, contactá a la comisión.',
+          );
+          break;
+        case 'sin-coincidencia':
+          setErrorSocio(
+            'No encontramos un socio con ese DNI. Revisá el número o solicitá tu carnet si todavía no estás registrado.',
+          );
+          break;
+        case 'error':
+          setErrorSocio(resultado.mensaje);
       }
-    } catch {
-      setErrorSocio('Ocurrió un error al buscar el DNI. Intentá nuevamente.');
     } finally {
       setBuscandoSocio(false);
     }
@@ -81,20 +93,40 @@ export default function LoginPage() {
     setErrorAdmin(null);
     setLoadingAdmin(true);
 
-    const { data, error: authError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      const { data, error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    if (authError) {
-      setErrorAdmin('Credenciales incorrectas. Verificá tu correo y contraseña.');
-      setLoadingAdmin(false);
-      return;
-    }
+      if (authError) {
+        console.error('[Supabase Auth] signInWithPassword falló', describirErrorAuth(authError));
+        setErrorAdmin(
+          authError.status === 429
+            ? 'Se realizaron demasiados intentos. Esperá un momento y volvé a probar.'
+            : authError.code === 'email_not_confirmed'
+              ? 'El correo todavía no está confirmado. Revisá tu casilla de email.'
+              : authError.code === 'user_banned'
+                ? 'La cuenta está deshabilitada. Contactá a la administración.'
+                : 'No se pudo iniciar sesión. Verificá las credenciales; si persiste, contactá a la administración.',
+        );
+        return;
+      }
 
-    if (data?.session) {
+      if (!data.session) {
+        console.error('[Supabase Auth] inicio de sesión sin error pero sin sesión');
+        setErrorAdmin('La autenticación no devolvió una sesión. Intentá nuevamente.');
+        return;
+      }
+
+      console.info('[Supabase Auth] inicio de sesión exitoso');
       router.refresh();
       router.push('/admin');
+    } catch (error) {
+      console.error('[Supabase Auth] error inesperado al iniciar sesión', describirErrorAuth(error));
+      setErrorAdmin('No se pudo conectar con el servicio de autenticación. Intentá nuevamente.');
+    } finally {
+      setLoadingAdmin(false);
     }
   };
 

@@ -1,18 +1,10 @@
 'use client';
 
 import { useRef, useState } from 'react';
-
-type SocioCarnet = {
-  nombre?: string | null;
-  apellido?: string | null;
-  dni?: string | null;
-  socio_racing?: string | null;
-  numero_socio_filial?: string | null;
-  foto_url?: string | null;
-};
+import type { SocioPortal } from '@/lib/socios';
 
 type CarnetSocioProps = {
-  socio?: SocioCarnet;
+  socio?: Partial<SocioPortal>;
   allowPrint?: boolean;
   allowFlip?: boolean;
 };
@@ -25,7 +17,7 @@ export default function CarnetSocio({
   const [mostrarDorso, setMostrarDorso] = useState(false);
   const tarjetaRef = useRef<HTMLDivElement>(null);
 
-  const datosSocio: SocioCarnet = socio ?? {
+  const datosSocio: Partial<SocioPortal> = socio ?? {
     nombre: 'GUSTAVO',
     apellido: 'COSTAS',
     dni: '22.222.222',

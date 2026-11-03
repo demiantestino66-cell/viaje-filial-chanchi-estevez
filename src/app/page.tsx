@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Oswald } from 'next/font/google';
 import Link from 'next/link';
-import { supabase } from '@/lib/supabase';
+import { buscarSocioPorDni, type SocioPortal } from '@/lib/socios';
 import CarnetSocio from '@/components/CarnetSocio';
 import SocioSkeleton from '@/components/SocioSkeleton';
 
@@ -62,18 +62,6 @@ const CANALES_OFICIALES = [
   },
 ];
 
-type Socio = {
-  nombre: string;
-  apellido: string;
-  dni: string;
-  estado: string;
-  cuota_al_dia?: string | null;
-  fecha_deuda?: string | null;
-  foto_url?: string | null;
-  socio_racing?: string | null;
-  numero_socio_filial?: string | null;
-};
-
 const glassCard =
   'rounded-3xl border border-sky-400/25 bg-slate-900/65 shadow-[0_0_35px_rgba(14,165,233,0.12)] backdrop-blur-xl';
 
@@ -86,7 +74,7 @@ export default function HomePage() {
   const [showModal, setShowModal] = useState(false);
   const [modalClosing, setModalClosing] = useState(false);
   const [dniConsulta, setDniConsulta] = useState('');
-  const [socioEncontrado, setSocioEncontrado] = useState<Socio | null>(null);
+  const [socioEncontrado, setSocioEncontrado] = useState<SocioPortal | null>(null);
   const [buscandoSocio, setBuscandoSocio] = useState(false);
   const [errorSocio, setErrorSocio] = useState<string | null>(null);
   const [consultaEnviada, setConsultaEnviada] = useState<string | null>(null);
@@ -121,42 +109,34 @@ export default function HomePage() {
     setSocioEncontrado(null);
     setBuscandoSocio(true);
 
-    try {
-      const { data, error } = await supabase
-        .from('socios')
-        .select(
-          'nombre,apellido,dni,estado,cuota_al_dia,fecha_deuda,foto_url,socio_racing,numero_socio_filial',
-        )
-        .eq('dni', dniConsulta.trim())
-        .maybeSingle();
-
-      if (error) {
+    const resultado = await buscarSocioPorDni(dniConsulta);
+    switch (resultado.tipo) {
+      case 'encontrado':
+        setSocioEncontrado(resultado.socio);
+        break;
+      case 'pendiente':
         setErrorSocio(
-          error.code === 'PGRST116'
-            ? 'No se encontró ningún socio registrado con ese DNI.'
-            : 'No se pudo completar la consulta. Intentá nuevamente más tarde.',
+          `Tu solicitud se encuentra en estado: "${resultado.estado}". Aún no ha sido aprobada.`,
         );
-        return;
-      }
-
-      if (!data) {
-        setErrorSocio('No se encontró ningún socio registrado con ese DNI.');
-        return;
-      }
-
-      if (data.estado !== 'aprobado') {
+        break;
+      case 'dni-invalido':
+        setErrorSocio('Ingresá un DNI válido de 7 u 8 números.');
+        break;
+      case 'padron-vacio':
         setErrorSocio(
-          `Tu solicitud se encuentra en estado: "${data.estado}". Aún no ha sido aprobada.`,
+          'No hay registros del padrón visibles para esta consulta. Si el DNI está correcto, contactá a la comisión.',
         );
-        return;
-      }
-
-      setSocioEncontrado(data);
-    } catch {
-      setErrorSocio('Ocurrió un error al buscar. Intentá nuevamente.');
-    } finally {
-      setBuscandoSocio(false);
+        break;
+      case 'sin-coincidencia':
+        setErrorSocio(
+          'No encontramos un socio con ese DNI. Revisá el número o solicitá tu carnet si todavía no estás registrado.',
+        );
+        break;
+      case 'error':
+        setErrorSocio(resultado.mensaje);
+        break;
     }
+    setBuscandoSocio(false);
   };
 
   const handleEnviarConsulta = (event: React.FormEvent<HTMLFormElement>) => {

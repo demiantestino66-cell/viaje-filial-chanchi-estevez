@@ -77,106 +77,128 @@ export default function RegistroSocioPage() {
   };
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center p-4 font-sans">
-      <div className="max-w-md w-full bg-slate-900 border border-sky-500/40 rounded-2xl p-6 md:p-8 shadow-2xl my-8">
-        
-        <div className="text-center mb-6">
-          <h1 className="text-2xl font-black text-sky-400 uppercase tracking-wide">
-            Asociate a la Filial Trelew
-          </h1>
-          <p className="text-xs text-slate-300 mt-1">
-            Completá tus datos y cargá tu foto para generar tu credencial.
-          </p>
+    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#050b16] p-4 font-sans text-white sm:p-6">
+      <div aria-hidden="true" className="pointer-events-none absolute -left-32 top-10 h-80 w-80 rounded-full bg-sky-500/10 blur-[120px]" />
+      <div aria-hidden="true" className="pointer-events-none absolute -bottom-40 -right-20 h-96 w-96 rounded-full bg-blue-600/10 blur-[140px]" />
+
+      <div className="relative my-6 w-full max-w-3xl overflow-hidden rounded-3xl border border-white/10 bg-slate-900/90 p-5 shadow-2xl shadow-black/40 backdrop-blur-md sm:my-8 sm:p-8">
+        <div className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-sky-400/[0.07] blur-3xl" />
+
+        <div className="relative mb-7 flex flex-col gap-4 border-b border-white/[0.08] pb-6 sm:flex-row sm:items-center">
+          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-sky-300/15 bg-sky-300/10 text-2xl text-sky-200">
+            <span aria-hidden="true">＋</span>
+          </div>
+          <div>
+            <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.22em] text-sky-200/65">
+              Racing Club · Filial Trelew
+            </p>
+            <h1 className="text-2xl font-black uppercase tracking-tight text-white sm:text-3xl">
+              Asociate a la Filial
+            </h1>
+            <p className="mt-1.5 text-sm leading-relaxed text-slate-400">
+              Completá tus datos y cargá tu foto para generar tu credencial.
+            </p>
+          </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          
-          <div className="flex flex-col items-center gap-2 mb-4">
-            <div className="w-24 h-28 bg-slate-950 border-2 border-dashed border-sky-500/50 rounded-xl flex items-center justify-center overflow-hidden relative shadow-inner">
+        <form onSubmit={handleSubmit} className="relative grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="sm:col-span-2">
+            <label className="mb-2 block text-xs font-semibold text-slate-300">Foto para el carnet</label>
+            <label className="group flex cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-slate-600/80 bg-white/[0.03] p-5 text-center transition-all duration-300 hover:border-sky-400/50 hover:bg-sky-400/[0.04] sm:flex-row sm:text-left">
               {previewFoto ? (
-                <img src={previewFoto} alt="Previsualización" className="w-full h-full object-cover object-top" />
+                <img
+                  src={previewFoto}
+                  alt="Previsualización"
+                  className="h-24 w-20 shrink-0 rounded-xl border border-white/10 object-cover object-top shadow-lg"
+                />
               ) : (
-                <span className="text-[10px] text-slate-400 text-center px-2">Subí tu foto de carnet</span>
+                <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-2xl text-sky-200 transition group-hover:border-sky-300/20 group-hover:bg-sky-300/10" aria-hidden="true">
+                  ↑
+                </span>
               )}
-            </div>
-            <label className="bg-sky-500/20 hover:bg-sky-500/40 text-sky-300 border border-sky-500/50 text-xs px-3 py-1.5 rounded-lg cursor-pointer transition-all font-bold uppercase tracking-wider">
-              {previewFoto ? 'Cambiar Foto' : 'Seleccionar Foto'}
-              <input type="file" accept="image/*" onChange={handleFotoChange} className="hidden" required />
+              <span className="min-w-0 flex-1">
+                <span className="block text-sm font-bold text-slate-100">
+                  {previewFoto ? 'Foto seleccionada' : 'Subí tu foto de carnet'}
+                </span>
+                <span className="mt-1 block text-xs text-slate-400">
+                  {previewFoto ? 'Elegí otra imagen para reemplazarla' : 'Seleccioná una imagen desde tu dispositivo'}
+                </span>
+              </span>
+              <span className="rounded-xl border border-sky-300/20 bg-sky-300/10 px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-sky-200 transition-all duration-300 group-hover:bg-sky-300/20">
+                {previewFoto ? 'Cambiar foto' : 'Seleccionar'}
+              </span>
+              <input type="file" accept="image/*" onChange={handleFotoChange} className="sr-only" required />
             </label>
           </div>
 
           <div>
-            <label className="block text-xs text-sky-200 mb-1 font-bold uppercase">Nombre</label>
+            <label className="mb-1.5 block text-xs font-semibold text-slate-300">Nombre</label>
             <input
               type="text"
               required
-              className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:ring-2 focus:ring-sky-500 focus:outline-none"
+              className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-sm text-white outline-none transition-all placeholder:text-slate-500 focus:border-sky-500 focus:ring-2 focus:ring-sky-500 focus:outline-none"
               onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
             />
           </div>
 
           <div>
-            <label className="block text-xs text-sky-200 mb-1 font-bold uppercase">Apellido</label>
+            <label className="mb-1.5 block text-xs font-semibold text-slate-300">Apellido</label>
             <input
               type="text"
               required
-              className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:ring-2 focus:ring-sky-500 focus:outline-none"
+              className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-sm text-white outline-none transition-all placeholder:text-slate-500 focus:border-sky-500 focus:ring-2 focus:ring-sky-500 focus:outline-none"
               onChange={(e) => setFormData({ ...formData, apellido: e.target.value })}
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs text-sky-200 mb-1 font-bold uppercase">DNI</label>
-              <input
-                type="text"
-                required
-                className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:ring-2 focus:ring-sky-500 focus:outline-none"
-                onChange={(e) => setFormData({ ...formData, dni: e.target.value })}
-              />
-            </div>
-            <div>
-              <label className="block text-xs text-sky-200 mb-1 font-bold uppercase">Teléfono</label>
-              <input
-                type="text"
-                required
-                placeholder="280..."
-                className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:ring-2 focus:ring-sky-500 focus:outline-none"
-                onChange={(e) => setFormData({ ...formData, telefono: e.target.value })}
-              />
-            </div>
+          <div>
+            <label className="mb-1.5 block text-xs font-semibold text-slate-300">DNI</label>
+            <input
+              type="text"
+              required
+              className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-sm text-white outline-none transition-all placeholder:text-slate-500 focus:border-sky-500 focus:ring-2 focus:ring-sky-500 focus:outline-none"
+              onChange={(e) => setFormData({ ...formData, dni: e.target.value })}
+            />
+          </div>
+          <div>
+            <label className="mb-1.5 block text-xs font-semibold text-slate-300">Teléfono</label>
+            <input
+              type="text"
+              required
+              placeholder="280..."
+              className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-sm text-white outline-none transition-all placeholder:text-slate-500 focus:border-sky-500 focus:ring-2 focus:ring-sky-500 focus:outline-none"
+              onChange={(e) => setFormData({ ...formData, telefono: e.target.value })}
+            />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs text-sky-200 mb-1 font-bold uppercase">Localidad</label>
-              <select
-                className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:ring-2 focus:ring-sky-500 focus:outline-none"
-                onChange={(e) => setFormData({ ...formData, localidad: e.target.value })}
-              >
-                <option value="Trelew">Trelew</option>
-                <option value="Rawson">Rawson</option>
-                <option value="Gaiman">Gaiman</option>
-                <option value="Dolavon">Dolavon</option>
-                <option value="Puerto Madryn">Puerto Madryn</option>
-                <option value="Otra">Otra</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs text-sky-200 mb-1 font-bold uppercase">N° Socio Racing</label>
-              <input
-                type="text"
-                placeholder="Opcional"
-                className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:ring-2 focus:ring-sky-500 focus:outline-none"
-                onChange={(e) => setFormData({ ...formData, socioRacing: e.target.value })}
-              />
-            </div>
+          <div>
+            <label className="mb-1.5 block text-xs font-semibold text-slate-300">Localidad</label>
+            <select
+              className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-sm text-white outline-none transition-all focus:border-sky-500 focus:ring-2 focus:ring-sky-500 focus:outline-none"
+              onChange={(e) => setFormData({ ...formData, localidad: e.target.value })}
+            >
+              <option value="Trelew">Trelew</option>
+              <option value="Rawson">Rawson</option>
+              <option value="Gaiman">Gaiman</option>
+              <option value="Dolavon">Dolavon</option>
+              <option value="Puerto Madryn">Puerto Madryn</option>
+              <option value="Otra">Otra</option>
+            </select>
+          </div>
+          <div>
+            <label className="mb-1.5 block text-xs font-semibold text-slate-300">N° Socio Racing</label>
+            <input
+              type="text"
+              placeholder="Opcional"
+              className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-sm text-white outline-none transition-all placeholder:text-slate-500 focus:border-sky-500 focus:ring-2 focus:ring-sky-500 focus:outline-none"
+              onChange={(e) => setFormData({ ...formData, socioRacing: e.target.value })}
+            />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-sky-500 hover:bg-sky-400 text-slate-950 font-black py-3 rounded-lg uppercase tracking-wider text-sm transition-all mt-4 disabled:opacity-50 cursor-pointer shadow-lg"
+            className="mt-2 inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-sky-300 to-sky-500 px-5 py-3 text-sm font-black uppercase tracking-wider text-slate-950 shadow-lg shadow-sky-500/20 transition-all duration-300 hover:scale-105 hover:from-sky-200 hover:to-sky-400 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 disabled:cursor-not-allowed disabled:opacity-50 sm:col-span-2"
           >
             {loading ? 'Cargando Solicitud...' : 'Enviar Solicitud de Socio'}
           </button>
